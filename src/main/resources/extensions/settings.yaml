@@ -1,0 +1,127 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: plugin-safe-redirect-setting
+spec:
+  forms:
+    - group: basic
+      label: 基本设置
+      formSchema:
+        - $formkit: text
+          name: pageTitle
+          label: 跳转页面标题
+          help: 安全跳转中间页的浏览器标题
+          value: "安全跳转提示"
+          validation: required
+
+        - $formkit: text
+          name: siteName
+          label: 网站名称
+          help: 显示在跳转提示页中的本站名称
+          value: "我的博客"
+          validation: required
+
+        - $formkit: textarea
+          name: whitelistDomains
+          label: 白名单域名
+          help: "白名单内的域名将直接跳转，不显示提示页。每行一个域名，例如：github.com"
+          value: ""
+
+        - $formkit: radio
+          name: enabled
+          label: 启用插件
+          help: 是否启用安全跳转功能，关闭后外链将直接跳转
+          value: "true"
+          options:
+            - label: 启用
+              value: "true"
+            - label: 禁用
+              value: "false"
+
+    - group: style
+      label: 样式设置
+      formSchema:
+        - $formkit: select
+          name: theme
+          label: 跳转页面主题
+          help: 选择安全跳转中间页的视觉主题
+          value: "default"
+          options:
+            - value: "default"
+              label: "🛡️ 默认 - 蓝色专业风格"
+            - value: "minimal"
+              label: "⬜ 极简 - 纯净白色风格"
+            - value: "tech"
+              label: "🌌 科技 - 深色渐变风格"
+            - value: "warm"
+              label: "🌅 温暖 - 橙色活力风格"
+            - value: "custom"
+              label: "🎨 自定义 - 使用自定义CSS"
+
+        - $formkit: number
+          name: countdown
+          label: 自动跳转倒计时（秒）
+          help: "0 表示不自动跳转，需用户手动点击确认"
+          value: 5
+          min: 0
+          max: 30
+
+        - $formkit: radio
+          name: showTargetUrl
+          label: 显示目标地址
+          help: 是否在跳转页面中展示完整的目标URL
+          value: "true"
+          options:
+            - label: 显示
+              value: "true"
+            - label: 隐藏
+              value: "false"
+
+        - $formkit: radio
+          name: showQrCode
+          label: 显示二维码
+          help: 是否在跳转页面显示目标链接的二维码（方便移动端扫码确认）
+          value: "false"
+          options:
+            - label: 显示
+              value: "true"
+            - label: 隐藏
+              value: "false"
+
+        - $formkit: text
+          name: iconUrl
+          label: 跳转页面图标链接
+          help: 图标图片的 URL 地址，留空则使用默认图标。建议尺寸：64x64 或更大
+          value: ""
+
+        - $formkit: textarea
+          name: customHtml
+          label: 自定义整个跳转页面
+          help: 完全替换默认跳转页面，支持变量：{url}=目标链接, {sitename}=网站名称。留空则使用默认模板。
+          value: ""
+
+    - group: advanced
+      label: 高级设置
+      formSchema:
+        - $formkit: textarea
+          name: customCss
+          label: 自定义 CSS
+          help: "仅在主题选择「自定义」时生效，输入您的自定义样式代码"
+          value: ""
+
+        - $formkit: textarea
+          name: customTip
+          label: 自定义提示文字
+          help: 覆盖跳转页的默认提示文字，留空则使用默认文字
+          value: ""
+
+        - $formkit: radio
+          name: trackOutbound
+          label: 记录外链点击
+          help: 在服务器日志中记录外链跳转行为（不收集用户隐私）
+          value: "false"
+          options:
+            - label: 启用
+              value: "true"
+            - label: 禁用
+              value: "false"
