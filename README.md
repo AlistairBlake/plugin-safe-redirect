@@ -16,20 +16,7 @@
 
 ## 📸 截图
 
-### 默认主题
-![默认主题](screenshot-default.png)
-
-### 极简主题
-![极简主题](screenshot-minimal.png)
-
-### 科技主题
-![科技主题](screenshot-tech.png)
-
-### 温暖主题
-![温暖主题](screenshot-warm.png)
-
-### 后台设置
-![后台设置](screenshot-settings.png)
+![跳转页面预览](screenshot.png)
 
 ## 🚀 快速开始
 
@@ -208,5 +195,8 @@ plugin-starter/
 ## 📮 联系方式
 
 - 作者：小聂
+- 博客：https://xiaonie.me
 - 主页：https://github.com/nieshilin/plugin-safe-redirect
 - 问题反馈：https://github.com/nieshilin/plugin-safe-redirect/issues
+
+欢迎访问我的博客 [xiaonie.me](https://xiaonie.me)
