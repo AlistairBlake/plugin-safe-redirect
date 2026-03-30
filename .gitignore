@@ -26,3 +26,6 @@ Thumbs.db
 
 # 依赖
 node_modules/
+
+# 工作目录
+.workbuddy/

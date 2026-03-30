@@ -16,7 +16,20 @@
 
 ## 📸 截图
 
-![插件 Logo](logo.svg)
+### 默认主题
+![默认主题](screenshot-default.png)
+
+### 极简主题
+![极简主题](screenshot-minimal.png)
+
+### 科技主题
+![科技主题](screenshot-tech.png)
+
+### 温暖主题
+![温暖主题](screenshot-warm.png)
+
+### 后台设置
+![后台设置](screenshot-settings.png)
 
 ## 🚀 快速开始
 
@@ -192,13 +205,8 @@ plugin-starter/
 
 [GPL-3.0](LICENSE)
 
-## 🙏 致谢
-
-- [Halo](https://halo.run/) - 强大的博客系统
-- [Halo Plugin Starter](https://github.com/halo-sigs/plugin-starter) - 插件开发模板
-
 ## 📮 联系方式
 
 - 作者：小聂
-- 主页：https://github.com/halo-dev/plugin-safe-redirect
-- 问题反馈：https://github.com/halo-dev/plugin-safe-redirect/issues
+- 主页：https://github.com/nieshilin/plugin-safe-redirect
+- 问题反馈：https://github.com/nieshilin/plugin-safe-redirect/issues
