@@ -218,7 +218,7 @@ public class SafeRedirectRouter {
         String encodedUrl = URLEncoder.encode(targetUrl, StandardCharsets.UTF_8);
         String displayUrl = targetUrl.length() > 80 ? targetUrl.substring(0, 80) + "..." : targetUrl;
         String tipText = (advanced.getCustomTip() != null && !advanced.getCustomTip().isBlank())
-            ? advanced.getCustomTip()
+            ? escapeHtml(advanced.getCustomTip())
             : "您即将离开 <strong>" + escapeHtml(basic.getSiteName())
                 + "</strong>，前往以下外部网站。外部链接的内容不受本站控制，请谨慎访问。";
 
@@ -273,6 +273,7 @@ public class SafeRedirectRouter {
                   .sr-buttons { flex-direction: column; }
                 }
               </style>
+              %s
             </head>
             <body>
               <canvas id="particle-canvas"></canvas>
@@ -294,14 +295,14 @@ public class SafeRedirectRouter {
                 escapeHtml(basic.getPageTitle()),
                 themeStyles,
                 backgroundOverride,
+                countdownJs,
                 iconHtml,
                 escapeHtml(basic.getPageTitle()),
                 tipText,
                 urlDisplayHtmlUI,
                 qrCodeHtmlUI,
                 countdownHtmlUI,
-                escapeHtml(targetUrl),
-                countdownJs
+                escapeHtml(targetUrl)
             );
     }
 
