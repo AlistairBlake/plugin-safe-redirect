@@ -1,0 +1,793 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" class="default">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex, nofollow"/>
+    <title>XZY&#39;s Blog-安全中心</title>
+    <link rel="preload stylesheet" as="style" href="/themes/theme-dream2-plus/assets/css/theme.min.css?mew=1.16.1">
+    <script src="/themes/theme-dream2-plus/assets/lib/jquery@3.5.1/jquery.min.js?v=1.16.1"></script>
+    <script src="/themes/theme-dream2-plus/assets/js/utils.min.js?mew=1.16.1"></script>
+    
+    
+  <style>
+    
+    @font-face {
+        font-family: "Dream Font";
+        font-display: swap;
+        font-weight: 400;
+        src: url("/upload/%E4%BB%BF%E5%AE%8B_GB2312.ttf") format("truetype");
+    }
+
+    html {
+      --theme: #50bfff;
+      --pjax-animation-bg-alpha: calc(60/100);
+      --cursor-default:url(/themes/theme-dream2-plus/assets/cursor/breeze/Arrow.cur?v=1.16.1),auto;--cursor-pointer:url(/themes/theme-dream2-plus/assets/cursor/breeze/Hand.cur?v=1.16.1),pointer;--cursor-text:url(/themes/theme-dream2-plus/assets/cursor/breeze/IBeam.cur?v=1.16.1),auto;--cursor-zoom-in:url(/themes/theme-dream2-plus/assets/cursor/breeze/Cross.cur?v=1.16.1),zoom-in;
+    }
+
+    html.night {
+      --theme: #5d93db;
+    }
+
+    body:before {
+      background: url("/upload/%E9%9B%AA%E5%B1%B1%E5%85%AC%E8%B7%AF.webp") center 0 no-repeat;
+    }
+
+    html.night body:before {
+      background: url("/upload/%E5%86%AC%E5%A4%A9%E7%9A%84%E8%B7%AF-xEFn.webp") center 0 no-repeat;
+    }
+
+    @media screen and (max-width: 768px) {
+      body:before {
+        background: url("/upload/%E9%9B%AA%E5%B1%B1%E5%85%AC%E8%B7%AF.webp") center 0 no-repeat;
+      }
+      html.night body:before {
+        background: url("/upload/%E5%86%AC%E5%A4%A9%E7%9A%84%E8%B7%AF-xEFn.webp") center 0 no-repeat;
+      }
+    }
+  </style>
+  <script>
+    window.logger = console.log;
+    
+    console.logStorage = [];
+    console.log = function (message, ...optionalParams) {
+      console.logStorage.push(()=>window.logger(message, optionalParams));
+      if (console.logStorage.length > 100) {
+        console.logStorage.shift()
+      }
+    };
+    console.logPrint = function () {
+      for (let logItem of console.logStorage) {
+        logItem();
+      }
+    };
+    
+    /** 主题配置 */
+    const DreamConfig = {};
+    /** 站点名 */
+    DreamConfig["site_title"] = "XZY's Blog";
+    /** 灰色模式 */
+    DreamConfig["gray_mode"] = false;
+    /** 定义多语言资源 */
+    DreamConfig["site_time_expression"]="\u5EFA\u7AD9{0}\u5929{1}\u65F6{2}\u5206{3}\u79D2";
+    DreamConfig['love_time_template'] = "{0} \u5929 {1} \u65F6 {2} \u5206 {3} \u79D2";
+    DreamConfig["love_time_template_year"] = "{0} \u5E74 {1} \u5929 {2} \u65F6 {3} \u5206 {4} \u79D2";
+    DreamConfig["timelife_template"] = [
+      {
+        title: "\u4ECA\u65E5\u5DF2\u7ECF\u8FC7\u53BB",
+        endTitle: "\u5C0F\u65F6",
+        num: 0,
+        percent: '0%',
+      },
+      {
+        title: "\u672C\u5468\u5DF2\u7ECF\u8FC7\u53BB",
+        endTitle: "\u5929",
+        num: 0,
+        percent: '0%',
+      },
+      {
+        title: "\u672C\u6708\u5DF2\u7ECF\u8FC7\u53BB",
+        endTitle: "\u5929",
+        num: 0,
+        percent: '0%',
+      },
+      {
+        title: "\u4ECA\u5E74\u5DF2\u7ECF\u8FC7\u53BB",
+        endTitle: "\u4E2A\u6708",
+        num: 0,
+        percent: '0%',
+      },
+    ]
+    /** 禁止debug资源 */
+    DreamConfig["ban_debug_tips"] = "\u7CFB\u7EDF\u5DF2\u5173\u95ED\u8C03\u8BD5\u529F\u80FD\uFF01<br\/>\u5982\u6709\u9700\u8981\uFF0C\u8BF7\u8054\u7CFB\u6280\u672F\u652F\u6301\u56E2\u961F\u83B7\u53D6\u5E2E\u52A9\u3002<br\/>\u611F\u8C22\u60A8\u7684\u7406\u89E3\u4E0E\u914D\u5408\uFF01";
+    DreamConfig["ban_debug_back_home"] = "\u8FD4\u56DE\u9996\u9875";
+    /** 分享 */
+    DreamConfig["dshare_qq_name"] = "QQ";
+    DreamConfig["dshare_qzone_name"] = "QQ\u7A7A\u95F4";
+    DreamConfig["dshare_wechat_name"] = "\u5FAE\u4FE1";
+    DreamConfig["dshare_wechat_qr_title"] = "\u5FAE\u4FE1\u5206\u4EAB";
+    DreamConfig["dshare_weibo_name"] = "\u65B0\u6D6A\u5FAE\u535A";
+    DreamConfig["dshare_douban_name"] = "\u8C46\u74E3";
+    DreamConfig["dshare_linkedin_name"] = "Linkedin";
+    DreamConfig["dshare_facebook_name"] = "Facebook";
+    DreamConfig["dshare_twitter_name"] = "Twitter";
+    DreamConfig["dshare_google_name"] = "Google";
+    DreamConfig["dshare_link_name"] = "\u590D\u5236\u94FE\u63A5";
+    DreamConfig["dshare_poster_name"] = "\u6D77\u62A5";
+    DreamConfig["dshare_poster_title"] = "\u5206\u4EAB\u6D77\u62A5";
+    DreamConfig["dshare_poster_tip"] = "\u624B\u673A\u626B\u63CF\u4E8C\u7EF4\u7801\u67E5\u770B";
+    DreamConfig["dshare_poster_button_name"] = "\u70B9\u51FB\u4E0B\u8F7D\u5C01\u9762";
+    /** 瞬间分享标题 */
+    DreamConfig["journals_share_title"] = "\u52A8\u6001\uFF1A";
+    /** 主题扩展组件的资源 */
+    DreamConfig["mew_subtitle_default_title"] = "\u9ED8\u8BA4\u6807\u9898";
+    DreamConfig["mew_music_not_enabled_tip"] = "\u672A\u5F00\u542F\u97F3\u4E50\u64AD\u653E\u5668\uFF01";
+    DreamConfig["mew_music_default_name"] = "\u97F3\u4E50";
+    DreamConfig["mew_music_default_artist"] = "\u672A\u77E5\u6B4C\u624B";
+    DreamConfig["mew_music_not_music_tip"] = "\u672A\u6307\u5B9A\u64AD\u653E\u7684\u97F3\u4E50\uFF01";
+    DreamConfig["mew_bilibili_not_bvid_tip"] = "bvid\u672A\u586B\u5199\uFF01";
+    DreamConfig["mew_tabs_not_tab_tip"] = "\u6CA1\u6709\u6807\u7B7E\u9875\uFF01";
+    DreamConfig["mew_tabs_default_title"] = "\u9ED8\u8BA4\u6807\u7B7E";
+    DreamConfig["mew_cloud_title"] = "\u8D44\u6E90\u6587\u4EF6\u5206\u4EAB";
+    DreamConfig["mew_cloud_default_name"] = "\u7F51\u7EDC\u6765\u6E90";
+    DreamConfig["mew_cloud_360_name"] = "360\u4E91\u76D8";
+    DreamConfig["mew_cloud_115_name"] = "115\u7F51\u76D8";
+    DreamConfig["mew_cloud_123_name"] = "123\u4E91\u76D8";
+    DreamConfig["mew_cloud_kk_name"] = "\u5938\u514B\u7F51\u76D8";
+    DreamConfig["mew_cloud_xl_name"] = "\u8FC5\u96F7\u4E91\u76D8";
+    DreamConfig["mew_cloud_onedrive_name"] = "OneDrive";
+    DreamConfig["mew_cloud_yd_name"] = "\u4E2D\u56FD\u79FB\u52A8\u4E91\u76D8";
+    DreamConfig["mew_cloud_ty_name"] = "\u5929\u7FFC\u4E91\u76D8";
+    DreamConfig["mew_cloud_lt_name"] = "\u8054\u901A\u4E91\u76D8";
+    DreamConfig["mew_cloud_uc_name"] = "UC\u7F51\u76D8";
+    DreamConfig["mew_cloud_pan_name"] = "\u7F51\u7EDC\u4E91\u76D8";
+    DreamConfig["mew_cloud_oss_name"] = "\u5BF9\u8C61\u5B58\u50A8";
+    DreamConfig["mew_cloud_bd_name"] = "\u767E\u5EA6\u7F51\u76D8";
+    DreamConfig["mew_cloud_wy_name"] = "\u5FAE\u4E91";
+    DreamConfig["mew_cloud_ali_name"] = "\u963F\u91CC\u4E91\u76D8";
+    DreamConfig["mew_cloud_github_name"] = "Github\u4ED3\u5E93";
+    DreamConfig["mew_cloud_gitee_name"] = "Gitee\u4ED3\u5E93";
+    DreamConfig["mew_cloud_gitlab_name"] = "Gitlab\u4ED3\u5E93";
+    DreamConfig["mew_cloud_gitea_name"] = "Gitea\u4ED3\u5E93";
+    DreamConfig["mew_cloud_git_name"] = "Git\u4ED3\u5E93";
+    DreamConfig["mew_cloud_lz_name"] = "\u84DD\u594F\u4E91\u7F51\u76D8";
+    DreamConfig["mew_cloud_source"] = "\u6765\u6E90\uFF1A";
+    DreamConfig["mew_cloud_extraction"] = "\u63D0\u53D6\u7801\uFF1A";
+
+    /** 一些通用多语言变量 */
+    DreamConfig["global_copy_name"] = "\u590D\u5236";
+    DreamConfig["global_copy_success"] = "\u590D\u5236\u6210\u529F";
+    DreamConfig["global_browser_not_supported"] = "\u60A8\u7684\u6D4F\u89C8\u5668\u4E0D\u652F\u6301";
+    DreamConfig["global_request_fail"] = "\u8BF7\u6C42\u5931\u8D25";
+    DreamConfig["global_like_success"] = "\u70B9\u8D5E\u6210\u529F";
+    /** 配置自定义灰色模式时段 */
+    let gray_mode_time_list = []
+    let custom_gray_mode_time_list = [];
+    if(custom_gray_mode_time_list) {
+      for (let time of custom_gray_mode_time_list) {
+        let type = time.realNode.time_span;
+        let desc = time.realNode.time_span_desc;
+        gray_mode_time_list.push({time: type, desc: desc});
+      }
+    }
+    DreamConfig["shiki_enable"] = true;
+    DreamConfig["header_fixed"] = true;
+    DreamConfig["gray_mode_time_list"] = gray_mode_time_list;
+    DreamConfig["pjax_state"] = true;
+    DreamConfig["pjax_animation_style"] = "multi-cube";
+    /** 配置分享方式 */
+    DreamConfig["post_share_sites"] = ["qq","qzone","wechat","weibo","douban","linkedin","facebook","twitter","google","link","poster"];
+    /** 配置灯笼特效文本 */
+    let effects_lantern_left = "\u6B22";
+    let effects_lantern_right = "\u8FCE";
+    if(effects_lantern_left && effects_lantern_left.length > 1) {
+      effects_lantern_left = effects_lantern_left.charAt(0);
+    }
+    if(effects_lantern_right && effects_lantern_right.length > 1) {
+      effects_lantern_right = effects_lantern_right.charAt(0);
+    }
+    DreamConfig["effects_lantern_left"] = effects_lantern_left;
+    DreamConfig["effects_lantern_right"] = effects_lantern_right;
+    DreamConfig["show_ai_summary"] = true;
+    /** 安全链接配置 */
+    DreamConfig["enable_security_link"] = true;
+    DreamConfig['security_link_url'] = "\/zhong-zhuan"
+    let whitelistStr = "*.xzyuse.space"
+    let hostname = window.location.hostname
+    if (whitelistStr) {
+      DreamConfig['security_link_whitelist'] = whitelistStr.split('\n').map(domain => domain.toLowerCase().trim()).filter(domain => domain.length > 0)
+      if (DreamConfig['security_link_whitelist'].indexOf(hostname) === -1) {
+        DreamConfig['security_link_whitelist'].push(hostname)
+      }
+    } else {
+      DreamConfig['security_link_whitelist'] = [hostname]
+    }
+    /** 配置主题模式 */
+    DreamConfig["default_theme"] = "light";
+    DreamConfig["theme_version"] = "1.16.1";
+    DreamConfig["theme_base"] = "/themes/theme-dream2-plus/assets".replace(/\?.*$/, '');
+    /** 移动端特效开关 */
+    DreamConfig["mobile_special_effects"] = true;
+    
+      
+      
+      DreamConfig["website_time"] = "2025-05-31T17:51";
+      
+      DreamConfig["notice_show_mode"] = 'index';
+      
+      
+      
+      
+      
+      
+      DreamConfig["effects_snowflake_mode"] = "night";
+      
+      
+      
+      
+      DreamConfig["load_progress"] = "center";
+      DreamConfig["journals_share_image"] = "/upload/aircle_cover.webp";
+      
+
+    (function () {
+      const hasNightInLocal = () => localStorage.getItem('night') !== null
+      const getNightInConfig = () => {
+        if (DreamConfig.default_theme === 'night') {
+          return true
+        }
+        if (DreamConfig.default_theme === 'system') {
+          return matchMedia('(prefers-color-scheme: dark)').matches
+        }
+        return false
+      }
+
+      let isNight = hasNightInLocal() ? localStorage.getItem('night') : getNightInConfig()
+      if (isNight.toString() === 'true') {
+        document.documentElement.classList.add('night')
+        document.documentElement.setAttribute('night', 'true')
+        document.documentElement.classList.add('color-scheme-dark')
+      } else {
+        document.documentElement.classList.add('color-scheme-light')
+        document.documentElement.removeAttribute('night')
+      }
+
+      //初始化灰色模式
+      sessionStorage.removeItem('gray-mode')
+      sessionStorage.removeItem('gray-mode-message')
+      if (DreamConfig.gray_mode === true) {
+        document.documentElement.classList.add('gray-mode')
+        sessionStorage.setItem('gray-mode', 'true')
+      } else if (DreamConfig.gray_mode === 'custom' && DreamConfig.gray_mode_time_list) {
+        const now = new Date()
+        const month = now.getMonth() + 1
+        const day = now.getDate()
+        const isDateInRange = (currentMonth, currentDay, timeRange) => {
+          let find = false
+          const timeParts = timeRange.time.split('|').map(part => part.trim());
+          const [startDate, endDate] = timeParts.length >= 2 ? timeParts : [timeParts[0], timeParts[0]];
+          if (!startDate || !endDate) {
+            return find
+          }
+          const [startMonth, startDay] = startDate.split('/').map(part => part.trim()).map(Number)
+          const [endMonth, endDay] = endDate.split('/').map(part => part.trim()).map(Number)
+          if (!startMonth || !startDay || !endMonth || !endDay) {
+            return find
+          }
+          const start = new Date(now.getFullYear(), startMonth - 1, startDay)
+          const end = new Date(now.getFullYear(), endMonth - 1, endDay)
+          const current = new Date(now.getFullYear(), currentMonth - 1, currentDay)
+          find = current >= start && current <= end
+          if (find) {
+            sessionStorage.setItem('gray-mode', 'true')
+            sessionStorage.setItem('gray-mode-message', timeRange.desc)
+          }
+          return find
+        }
+
+        for (const timeRange of DreamConfig.gray_mode_time_list) {
+          try {
+            if (isDateInRange(month, day, timeRange)) {
+              document.documentElement.classList.add('gray-mode')
+              break
+            }
+          } catch (e) {
+            console.log(e)
+          }
+        }
+      }
+    })()
+  </script>
+
+    <link rel="preload stylesheet" as="style" href="/themes/theme-dream2-plus/assets/lib/remixicon@4.9.1/remixicon.min.css?v=1.16.1">
+    <link rel="stylesheet" href="/themes/theme-dream2-plus/assets/css/cursor.min.css?mew=1.16.1">
+    <style type="text/css">
+        html {
+            --back-img-url: url(/upload/bg-green.webp);
+        }
+
+        .gray-mode {
+            filter: grayscale(1) !important;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        .content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        html body {
+            background-image: linear-gradient(135deg, #a0a0a0 0%, #8c8c8c 100%), var(--back-img-url);
+            background-blend-mode: overlay;
+        }
+
+        html.night body {
+            background-image: linear-gradient(135deg, #364f6b 0%, #222831 100%), var(--back-img-url);
+            background-blend-mode: overlay;
+        }
+
+        html .loading {
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        html.night .loading {
+            background: rgba(57, 62, 70, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .others-end a:hover {
+            background: var(--theme);
+            box-shadow: 0 3px 8px var(--theme);
+        }
+
+        .progress-bar {
+            width: 100%;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 10px;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /*.progress {*/
+        /*    box-shadow: 0 0 10px rgba(171, 237, 216, 0.5);*/
+        /*}*/
+
+        @keyframes fadein {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading {
+            animation: fadein 0.3s ease-out;
+        }
+
+        .font-color {
+            color: #abedd8;
+        }
+
+        html.night .loading {
+            background: #393e46;
+            box-shadow: 0 4px 8px rgba(100, 100, 100, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .loading {
+                width: 75% !important;
+                max-width: 400px !important;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 35px;
+            border-radius: 24px;
+            animation: fadein 0.3s ease-out;
+            width: 400px;
+            max-width: 90%;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
+            position: relative;
+            z-index: 2;
+            isolation: isolate;
+        }
+
+        .loading::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            border-radius: 26px;
+            background: linear-gradient(145deg,
+                rgba(255,255,255,0.3) 0%,
+                rgba(255,255,255,0.1) 100%);
+            z-index: -1;
+        }
+
+        html.night .loading {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(57, 62, 70, 0.85);
+        }
+
+        html.night .loading::before {
+            background: linear-gradient(145deg,
+                rgba(255,255,255,0.1) 0%,
+                rgba(255,255,255,0.05) 100%);
+        }
+
+        .content-title img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px auto;
+            display: block;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .content-title img:hover {
+            transform: scale(1.05);
+        }
+
+        .others-tip {
+            border: 1px solid var(--light-b);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 20px;
+            display: block;
+            margin-top: 5px;
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #F7F9FE;
+            color: var(--dark-a);
+        }
+
+        .others-end a {
+            box-shadow: 0 2px 6px var(--theme);
+            will-change: transform, opacity;
+            padding: 10px 20px;
+            border-radius: 16px;
+            border: none;
+            font-size: 16px;
+            width: 70px;
+            height: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #fefefe;
+            background: var(--theme);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            line-height: 20px;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+
+        .content-title {
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--title);
+        }
+
+        .content-title img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px auto;
+            display: block;
+        }
+
+        .others-topic {
+            margin-bottom: 10px;
+            line-height: 1.2rem;
+            font-size: 16px;
+            letter-spacing: 1px;
+            color: var(--main);
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            overflow: hidden;
+        }
+
+        .others-end {
+            display: flex;
+            justify-content: center;
+            gap: 20%;
+            margin-top: 20px;
+        }
+
+        .progress {
+            width: 0;
+            height: 100%;
+            background-color: var(--theme);
+            transition: width 5s linear;
+        }
+
+        .progress-end {
+            width: 100% !important;
+            transition: none !important;
+        }
+
+        .countdown-text {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--main);
+            text-align: center;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            align-items: baseline;
+        }
+
+        .countdown-text i {
+            font-size: 1.15em;
+            color: #FF9800;
+        }
+
+        #countdown {
+            font-weight: bold;
+            color: var(--theme);
+        }
+
+    </style>
+    
+<meta name="msvalidate.01" content="6DE304CA502AB267F9931271EFF68348" />
+<meta name="generator" content="Halo 2.24.2"/><meta name="description" content=""/><!-- plugin-comment-widget start -->
+<link rel="modulepreload" href="/plugins/PluginCommentWidget/assets/static/comment-widget.js?version=3.1.1">
+<link rel="stylesheet" href="/plugins/PluginCommentWidget/assets/static/index.css?version=3.1.1" />
+<!-- plugin-comment-widget end -->
+<!-- PluginSearchWidget start -->
+<script src="/plugins/PluginSearchWidget/assets/static/search-widget.iife.js?version=1.7.1" defer></script>
+<link rel="stylesheet" href="/plugins/PluginSearchWidget/assets/static/style.css?version=1.7.1" />
+<!-- PluginSearchWidget end -->
+<link rel="canonical" href="https://blog.xzyuse.space/zhong-zhuan" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="&#20013;&#36716;" />
+<meta property="og:image" content="https://blog.xzyuse.space/upload/aircle_cover.webp" />
+<meta property="og:url" content="https://blog.xzyuse.space/zhong-zhuan" />
+<meta property="og:release_date" content="2025-05-29T10:43:13" />
+<meta property="og:modified_time" content="2025-05-29T10:43:13" />
+<meta property="og:author" content="Administrator" />
+<meta property="bytedance:published_time" content="2025-05-29T10:43:13" />
+<meta property="bytedance:updated_time" content="2025-05-29T10:43:13" />
+<script type="application/ld+json">
+{
+  "@context": "https://ziyuan.baidu.com/contexts/cambrian.jsonld",
+  "@id": "https://blog.xzyuse.space/zhong-zhuan",
+  "title": "\u4E2D\u8F6C",
+  "pubDate": "2025-05-29T10:43:13",
+  "upDate": "2025-05-29T10:43:13"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://blog.xzyuse.space/zhong-zhuan"
+  },
+  "headline": "\u4E2D\u8F6C",
+  "datePublished": "2025-05-29T10:43:13+08:00",
+  "dateModified": "2025-05-29T10:43:13+08:00",
+  "author": {
+    "@type": "Person",
+    "name": "Administrator"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "XZY's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://blog.xzyuse.space/upload/logo-big.webp"
+    }
+  },
+  "image": "https://blog.xzyuse.space/upload/aircle_cover.webp",
+  "url": "https://blog.xzyuse.space/zhong-zhuan"
+}
+</script>
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="&#20013;&#36716;" />
+<meta name="twitter:image" content="https://blog.xzyuse.space/upload/aircle_cover.webp" />
+<!-- plugin-shiki start -->
+<script type="module" src="/plugins/shiki/assets/static/shiki-code.js?version=1.3.0"></script>
+<!-- plugin-shiki end -->
+<!-- plugin-katex start -->
+<link rel="stylesheet" href="/plugins/plugin-katex/assets/static/katex.min.css?version=3.0.0" />
+<script src="/plugins/plugin-katex/assets/static/katex.min.js?version=3.0.0"></script>
+<!-- plugin-katex end -->
+<!-- plugin-editor-hyperlink-card start -->
+<script src="/plugins/editor-hyperlink-card/assets/static/index.iife.js?version=1.9.1"></script>
+<link rel="stylesheet" href="/plugins/editor-hyperlink-card/assets/static/index.css?version=1.9.1" />
+<!-- plugin-editor-hyperlink-card end -->
+<!-- plugin-typst start -->
+<link rel="stylesheet" href="/plugins/plugin-typst/assets/static/typst.css?version=2.0.2" />
+<!-- plugin-typst end -->
+<!-- restricted-reading start -->
+<script src="/plugins/restricted-reading/assets/static/content-restrict-widget.iife.js?version=1.7.0"></script>
+<link rel="stylesheet" href="/plugins/restricted-reading/assets/static/var.css?version=1.7.0" />
+<!-- restricted-reading end -->
+<style>
+    :root {
+        --halo-restrict-widget-primary-color: #2563eb;
+        --halo-restrict-widget-primary-subtle-color: #93c5fd;
+        --halo-restrict-widget-secondary-color: #e4e4e7;
+        --halo-restrict-widget-light-color: #f9fafb;
+        --halo-restrict-widget-title-color: #18181b;
+        --halo-restrict-widget-title-subtle-color: #52525b;
+        --halo-restrict-widget-modal-bg-color: #fff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+    .color-scheme-auto,
+        [data-color-scheme='auto'] content-restrict-widget {
+            color-scheme: dark;
+            --halo-restrict-widget-primary-color: #1e40af;
+            --halo-restrict-widget-primary-subtle-color: #3b82f6;
+            --halo-restrict-widget-secondary-color: #3f3f46;
+            --halo-restrict-widget-light-color: #18181b;
+            --halo-restrict-widget-title-color: #e5e5e5;
+            --halo-restrict-widget-title-subtle-color: #a1a1aa;
+            --halo-restrict-widget-modal-bg-color: #27272a;
+        }
+    }
+
+    .color-scheme-dark,
+    .dark,
+    [data-color-scheme='dark'] content-restrict-widget {
+        color-scheme: dark;
+        --halo-restrict-widget-primary-color: #1e40af;
+        --halo-restrict-widget-primary-subtle-color: #3b82f6;
+        --halo-restrict-widget-secondary-color: #3f3f46;
+        --halo-restrict-widget-light-color: #18181b;
+        --halo-restrict-widget-title-color: #e5e5e5;
+        --halo-restrict-widget-title-subtle-color: #a1a1aa;
+        --halo-restrict-widget-modal-bg-color: #27272a;
+    }
+</style>
+<link rel="icon" href="/upload/logo1-short.webp" />
+<script async defer src="/halo-tracker.js" data-group="content.halo.run" data-plural="singlepages" data-name="4a143182-e4ad-4db1-8010-7bc11526dabc"></script>
+</head>
+<body>
+    <div class="content">
+        <div class="loading">
+            <div class="content-title">
+                <img src="/upload/avatar.webp" alt="favicon">
+                <span>XZY&#39;s Blog</span>
+            </div>
+            <div class="others">
+                <div class="others-tip">请注意您的账号和财产安全！</div>
+                <div class="others-topic">
+                </div>
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+                <div class="countdown-text">
+                    <i class="ri-flashlight-fill"></i><span id="countdown_text_tip">将在 <span id="countdown">5</span> 秒后跳转，请自行确认链接安全性</span>
+                </div>
+                <div class="others-end">
+                    <a target="_self" href="/" aria-label="继续访问" title="继续访问">继续访问</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var effects_show = '["click","move","effects"]'
+        //非移动端加载特效
+        if (!Utils.isMobile() || DreamConfig.mobile_special_effects) {
+          var click = effects_show.includes('click')
+          var move = effects_show.includes('move')
+          var effects = effects_show.includes('effects')
+
+          move && DreamConfig.cursor_move && Utils.cachedScript(`${DreamConfig.theme_base}/js/cursor/move/${DreamConfig.cursor_move}.min.js?mew=${DreamConfig.theme_version}`)
+          click && DreamConfig.cursor_click && Utils.cachedScript(`${DreamConfig.theme_base}/js/cursor/click/${DreamConfig.cursor_click}.min.js?mew=${DreamConfig.theme_version}`)
+          effects && DreamConfig.effects_lantern_mode && Utils.cachedScript(`${DreamConfig.theme_base}/js/effects/lantern.min.js?mew=${DreamConfig.theme_version}`)
+          effects && DreamConfig.effects_sakura_mode && Utils.cachedScript(`${DreamConfig.theme_base}/js/effects/sakura.min.js?mew=${DreamConfig.theme_version}`)
+          effects && DreamConfig.effects_snowflake_mode && Utils.cachedScript(`${DreamConfig.theme_base}/js/effects/snowflake.min.js?mew=${DreamConfig.theme_version}`)
+          effects && DreamConfig.effects_universe_mode && Utils.cachedScript(`${DreamConfig.theme_base}/js/effects/universe.min.js?mew=${DreamConfig.theme_version}`)
+          effects && DreamConfig.effects_circle_magic_mode && Utils.cachedScript(`${DreamConfig.theme_base}/js/effects/circleMagic.min.js?mew=${DreamConfig.theme_version}`)
+          effects && DreamConfig.effects_quantum_silk_thread_mode && Utils.cachedScript(`${DreamConfig.theme_base}/js/effects/quantum.min.js?mew=${DreamConfig.theme_version}`)
+          effects && DreamConfig.effects_rain_mode && Utils.cachedScript(`${DreamConfig.theme_base}/js/effects/rain.min.js?mew=${DreamConfig.theme_version}`)
+        }
+
+        //处理跳转链接，若链接不合法则跳转到首页
+        let link_jump_desc = '您即将离开{title}，去往：{url}'
+        let targetUrl = 'https://xuanyuan.cloud/free'
+        //校验链接是否合法
+        try {
+          let tUrl = new URL(targetUrl)
+        } catch (e) {
+          // URL解析失败，返回首页
+          targetUrl = '/'
+        }
+        // 使用正则表达式进行全局替换
+        link_jump_desc = link_jump_desc.replace(new RegExp('{title}', 'g'), DreamConfig.site_title);
+        link_jump_desc = link_jump_desc.replace(new RegExp('{url}', 'g'), targetUrl);
+        document.querySelector('.others-topic').innerHTML = link_jump_desc
+        document.querySelector('.others-end a').setAttribute('href', targetUrl);
+
+        // 倒计时
+        let timer
+        let countdownElement
+        let countdownTextElement = document.getElementById('countdown_text_tip')
+        let countdown = 5
+        if (countdown > 0) {
+          const progress = document.querySelector('.progress');
+          progress.style.width = '0';
+          void progress.offsetWidth;
+          progress.style.width = '100%';
+          countdownElement = document.getElementById('countdown')
+          timer = setInterval(function () {
+            countdown--
+            countdownElement.textContent = countdown
+            if (countdown <= 0) {
+              countdownTextElement.textContent = '正在跳转，请稍候…'
+              clearInterval(timer)
+              setTimeout(function() {
+                window.location.replace(targetUrl);
+              }, 30);
+            }
+          }, 1000)
+        } else {
+          document.querySelector('.progress-bar').style.display = 'none';
+          document.querySelector('.countdown-text').style.display = 'none';
+        }
+        // 继续访问，不记录历史，避免返回此页面
+        document.querySelector('.others-end a').addEventListener('click', function (e) {
+          e.preventDefault()
+          if (timer) {
+            clearInterval(timer)
+          }
+          setTimeout(function() {
+            window.location.replace(targetUrl);
+          }, 30);
+          if (countdownElement) {
+            countdownElement.textContent = 0
+          }
+          countdownTextElement.textContent = '正在跳转，请稍候…'
+          document.querySelector('.progress-bar > .progress').classList.add('progress-end')
+        })
+      });
+    </script>
+    
+</body>
+</html>

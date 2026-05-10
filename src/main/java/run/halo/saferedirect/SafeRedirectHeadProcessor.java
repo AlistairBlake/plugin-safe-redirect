@@ -38,25 +38,41 @@ public class SafeRedirectHeadProcessor implements TemplateHeadProcessor {
                               IElementModelStructureHandler handler) {
         return settingFetcher.fetch("basic", BasicSetting.class)
             .defaultIfEmpty(new BasicSetting())
-            .doOnNext(basic -> {
-                if (!basic.isEnabled()) {
-                    log.debug("SafeRedirect plugin is disabled, skipping head injection.");
-                    return;
+            .flatMap(basic -> {
+                try {
+                    if (!basic.isEnabled()) {
+                        log.debug("SafeRedirect plugin is disabled, skipping head injection.");
+                        return Mono.empty();
+                    }
+                    String whitelistJs = buildWhitelistJs(basic.getWhitelistDomains());
+                    String script = buildInjectedScript(whitelistJs);
+
+                    IModelFactory modelFactory = context.getConfiguration().getModelFactory(
+                        context.getTemplateMode());
+                    IModel scriptModel = modelFactory.createModel();
+                    scriptModel.add(modelFactory.createText(script));
+                    model.addModel(scriptModel);
+
+                    log.debug("SafeRedirect: injected link-intercept script into <head>.");
+                    return Mono.empty();
+                } catch (Exception e) {
+                    log.error("SafeRedirect: failed to build/inject script, skipping.", e);
+                    return Mono.empty();
                 }
-                String whitelistJs = buildWhitelistJs(basic.getWhitelistDomains());
-                String script = buildInjectedScript(whitelistJs);
-
-                IModelFactory modelFactory = context.getConfiguration().getModelFactory(
-                    context.getTemplateMode());
-                IModel scriptModel = modelFactory.createModel();
-                scriptModel.add(modelFactory.createText(script));
-                model.addModel(scriptModel);
-
-                log.debug("SafeRedirect: injected link-intercept script into <head>.");
             })
-            .then()
             .onErrorResume(e -> {
-                log.error("SafeRedirect: failed to process head injection, skipping.", e);
+                log.error("SafeRedirect: failed to fetch settings for head injection, using safe defaults.", e);
+                try {
+                    String script = buildInjectedScript("[]");
+                    IModelFactory modelFactory = context.getConfiguration().getModelFactory(
+                        context.getTemplateMode());
+                    IModel scriptModel = modelFactory.createModel();
+                    scriptModel.add(modelFactory.createText(script));
+                    model.addModel(scriptModel);
+                    log.debug("SafeRedirect: injected fallback link-intercept script into <head>.");
+                } catch (Exception ex) {
+                    log.error("SafeRedirect: fallback injection also failed.", ex);
+                }
                 return Mono.empty();
             });
     }
