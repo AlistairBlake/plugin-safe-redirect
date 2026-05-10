@@ -7,10 +7,12 @@ import lombok.Data;
  */
 @Data
 public class StyleSetting {
-    private String theme = "default";
+    private String theme = "dream";
     private int countdown = 5;
     private boolean showTargetUrl = true;
     private boolean showQrCode = false;
     private String iconUrl = "";
     private String customHtml = "";
+    private String backgroundUrl = "";
+    private String backgroundColor = "";
 }

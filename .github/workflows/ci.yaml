@@ -1,24 +1,78 @@
-name: CI
+name: Build & Release
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Build plugin
+        run: ./gradlew build --no-daemon -x test
+
+      - name: Get plugin version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Upload plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-safe-redirect-${{ steps.get_version.outputs.VERSION }}
+          path: build/libs/*.jar
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## 🚀 Safe Redirect Plugin ${{ steps.get_version.outputs.VERSION }}
+
+            ### ✨ 功能特性
+            - 🔒 安全跳转中间页，防止恶意链接
+            - 🎨 **Dream 毛玻璃主题**（默认）+ 4种可选主题
+            - 🖼️ 自定义背景图片/颜色支持
+            - 🎯 自定义图标支持
+            - ⏱️ 进度条倒计时（Dream主题）/ 数字倒计时（其他主题）
+            - 📱 二维码扫码功能
+            - ✅ 白名单域名直接跳转
+            - 🌐 完全响应式设计
+
+            ### 📦 安装方式
+            1. 下载本 Release 中的 `.jar` 文件
+            2. 进入 Halo 后台 → 插件 → 安装插件
+            3. 上传 `.jar` 文件并启用
+
+            ### ⚙️ 配置说明
+            安装后可在「插件设置」中自定义：
+            - 跳转页面主题（Dream/极简/科技/温暖/自定义）
+            - 倒计时时间（0-30秒）
+            - 是否显示目标URL、二维码
+            - 自定义图标、背景图、背景色等
+
+            ---
+            *由 [SafeRedirect Team](https://github.com/halo-dev) 自动构建*
+          files: build/libs/*.jar
+          draft: false
+          prerelease: ${{ contains(steps.get_version.outputs.VERSION, '-rc') || contains(steps.get_version.outputs.VERSION, '-beta') || contains(steps.get_version.outputs.VERSION, '-alpha') }}

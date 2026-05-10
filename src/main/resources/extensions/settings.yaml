@@ -45,10 +45,10 @@ spec:
           name: theme
           label: 跳转页面主题
           help: 选择安全跳转中间页的视觉主题
-          value: "default"
+          value: "dream"
           options:
-            - value: "default"
-              label: "🛡️ 默认 - 蓝色专业风格"
+            - value: "dream"
+              label: "� 默认 - Dream 毛玻璃中转页"
             - value: "minimal"
               label: "⬜ 极简 - 纯净白色风格"
             - value: "tech"
@@ -92,6 +92,18 @@ spec:
           name: iconUrl
           label: 跳转页面图标链接
           help: 图标图片的 URL 地址，留空则使用默认图标。建议尺寸：64x64 或更大
+          value: ""
+
+        - $formkit: text
+          name: backgroundUrl
+          label: 背景图片链接
+          help: 背景图片的 URL 地址（支持 jpg/png/webp），留空则使用主题默认背景。建议尺寸：1920x1080 或更大
+          value: ""
+
+        - $formkit: text
+          name: backgroundColor
+          label: 背景颜色（可选）
+          help: CSS 颜色值，例如：#ffffff、rgba(0,0,0,0.8)、linear-gradient(...)。在背景图片下方显示作为叠加层，或单独作为纯色背景
           value: ""
 
         - $formkit: textarea
