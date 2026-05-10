@@ -79,27 +79,16 @@ public class SafeRedirectRouter {
 
         return settingFetcher.fetch("basic", BasicSetting.class)
             .defaultIfEmpty(new BasicSetting())
-            .flatMap(basicSetting -> {
-                try {
-                    return handleRedirectInternal(finalUrl, basicSetting);
-                } catch (Exception e) {
-                    log.error("Error processing redirect to: {}", finalUrl, e);
-                    return Mono.just(ServerResponse.internalServerError()
-                        .contentType(MediaType.TEXT_HTML)
-                        .bodyValue(buildErrorPage("服务器内部错误",
-                            "处理跳转请求时发生错误：" + escapeHtml(e.getMessage()) + "<br><br>" +
-                            "<a href=\"" + escapeHtml(finalUrl) + "\">点击此处直接访问目标网站</a>")));
-                }
-            })
+            .flatMap(basicSetting -> handleRedirectInternal(finalUrl, basicSetting))
             .onErrorResume(e -> {
                 log.error("Unexpected error in redirect handler: {}", finalUrl, e);
-                return Mono.just(ServerResponse.internalServerError()
+                return ServerResponse.status(500)
                     .contentType(MediaType.TEXT_HTML)
                     .bodyValue(buildErrorPage("服务器内部错误",
                         "插件执行时发生意外错误：<br><code>" + 
                         escapeHtml(e.getClass().getName() + ": " + e.getMessage()) +
                         "</code><br><br>" +
-                        "<a href=\"" + escapeHtml(finalUrl) + "\">🔗 点击此处直接访问目标网站</a>")));
+                        "<a href=\"" + escapeHtml(finalUrl) + "\">🔗 点击此处直接访问目标网站</a>"));
             });
     }
 
@@ -109,7 +98,7 @@ public class SafeRedirectRouter {
     private Mono<ServerResponse> handleRedirectInternal(String finalUrl, BasicSetting basicSetting) {
         if (!basicSetting.isEnabled()) {
             try {
-                return Mono.just(ServerResponse.temporaryRedirect(URI.create(finalUrl)).block());
+                return ServerResponse.temporaryRedirect(URI.create(finalUrl)).build();
             } catch (Exception e) {
                 log.error("Failed to create redirect URI: {}", finalUrl, e);
                 return buildErrorResponse(finalUrl, "重定向失败");
@@ -120,7 +109,7 @@ public class SafeRedirectRouter {
         if (whitelisted) {
             log.debug("Whitelisted domain, direct redirect to: {}", finalUrl);
             try {
-                return Mono.just(ServerResponse.temporaryRedirect(URI.create(finalUrl)).block());
+                return ServerResponse.temporaryRedirect(URI.create(finalUrl)).build();
             } catch (Exception e) {
                 log.error("Failed to create redirect URI for whitelisted URL: {}", finalUrl, e);
                 return buildErrorResponse(finalUrl, "白名单跳转失败");
@@ -139,14 +128,14 @@ public class SafeRedirectRouter {
                         try {
                             String customHtml = styleSetting.getCustomHtml();
                             if (customHtml != null && !customHtml.trim().isEmpty()) {
-                                return Mono.just(ServerResponse.ok()
+                                return ServerResponse.ok()
                                     .contentType(MediaType.TEXT_HTML)
-                                    .bodyValue(buildCustomPage(finalUrl, basicSetting, customHtml.trim())));
+                                    .bodyValue(buildCustomPage(finalUrl, basicSetting, customHtml.trim()));
                             }
-                            return Mono.just(ServerResponse.ok()
+                            return ServerResponse.ok()
                                 .contentType(MediaType.TEXT_HTML)
                                 .bodyValue(buildRedirectPage(
-                                    finalUrl, basicSetting, styleSetting, advancedSetting)));
+                                    finalUrl, basicSetting, styleSetting, advancedSetting));
                         } catch (Exception e) {
                             log.error("Error building redirect page for: {}", finalUrl, e);
                             return buildErrorResponse(finalUrl, "页面构建失败: " + e.getMessage());
@@ -159,7 +148,7 @@ public class SafeRedirectRouter {
      * 构建统一的错误响应
      */
     private Mono<ServerResponse> buildErrorResponse(String targetUrl, String errorMessage) {
-        return Mono.just(ServerResponse.ok()
+        return ServerResponse.ok()
             .contentType(MediaType.TEXT_HTML)
             .bodyValue(buildErrorPage("跳转处理失败",
                 errorMessage + "<br><br>" +
@@ -167,7 +156,7 @@ public class SafeRedirectRouter {
                 "<a href=\"" + escapeHtml(targetUrl) + "\" " +
                 "style=\"display:inline-block;padding:12px 24px;background:#3B82F6;color:white;" +
                 "border-radius:8px;text-decoration:none;font-weight:bold;\">🔗 直接访问目标网站</a>" +
-                "</div>")));
+                "</div>"));
     }
 
     /**
@@ -230,8 +219,6 @@ public class SafeRedirectRouter {
         String countdownHtmlUI = buildCountdownHtml(countdown, style.getTheme());
         String qrCodeHtmlUI = buildQrCodeHtml(encodedUrl, style.isShowQrCode());
         String urlDisplayHtmlUI = buildUrlDisplayHtml(displayUrl, style.isShowTargetUrl());
-        String customHtmlUI = (style.getCustomHtml() != null && !style.getCustomHtml().trim().isEmpty())
-            ? style.getCustomHtml().trim() : "";
         String themeStyles = buildThemeStyles(style.getTheme());
         String backgroundOverride = buildBackgroundOverride(style.getBackgroundUrl(), style.getBackgroundColor());
         String iconHtml = buildIconHtml(style.getIconUrl());
@@ -292,9 +279,7 @@ public class SafeRedirectRouter {
                   <a href="%s" rel="noopener noreferrer nofollow" id="confirm-btn" class="sr-btn sr-btn-primary">确认跳转</a>
                   <a href="javascript:history.back()" class="sr-btn sr-btn-secondary">返回上页</a>
                 </div>
-            %s
               </div>
-            %s
             </body>
             </html>
             """.formatted(
@@ -308,7 +293,6 @@ public class SafeRedirectRouter {
                 qrCodeHtmlUI,
                 countdownHtmlUI,
                 escapeHtml(targetUrl),
-                customHtmlUI,
                 countdownJs
             );
     }
@@ -586,11 +570,11 @@ public class SafeRedirectRouter {
      */
     private String buildCustomPage(String targetUrl, BasicSetting basic, String customHtml) {
         String encodedUrl = URLEncoder.encode(targetUrl, StandardCharsets.UTF_8);
-        // 支持变量替换：{url} = 目标URL，{sitename} = 网站名称
+        // 支持变量替换：{url} = 目标URL，{sitename} = 网站名称（已进行HTML转义防止XSS）
         String processedHtml = customHtml
-            .replace("{url}", targetUrl)
-            .replace("{sitename}", basic.getSiteName())
-            .replace("{encodedurl}", encodedUrl);
+            .replace("{url}", escapeHtml(targetUrl))
+            .replace("{sitename}", escapeHtml(basic.getSiteName()))
+            .replace("{encodedurl}", escapeHtml(encodedUrl));
         
         return "<!DOCTYPE html>\n"
             + "<html lang=\"zh-CN\">\n"
@@ -612,7 +596,7 @@ public class SafeRedirectRouter {
      * 构建主题样式
      */
     private String buildThemeStyles(String theme) {
-        if (theme == null) theme = "default";
+        if (theme == null) theme = "dream";
         
         switch (theme) {
             case "minimal":

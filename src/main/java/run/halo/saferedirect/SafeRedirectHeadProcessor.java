@@ -40,15 +40,12 @@ public class SafeRedirectHeadProcessor implements TemplateHeadProcessor {
             .defaultIfEmpty(new BasicSetting())
             .doOnNext(basic -> {
                 if (!basic.isEnabled()) {
-                    // 插件禁用时不注入任何代码
                     log.debug("SafeRedirect plugin is disabled, skipping head injection.");
                     return;
                 }
-                // 构建白名单数组 JS 代码
                 String whitelistJs = buildWhitelistJs(basic.getWhitelistDomains());
                 String script = buildInjectedScript(whitelistJs);
 
-                // 向 <head> 追加 script 标签
                 IModelFactory modelFactory = context.getConfiguration().getModelFactory(
                     context.getTemplateMode());
                 IModel scriptModel = modelFactory.createModel();
@@ -57,7 +54,11 @@ public class SafeRedirectHeadProcessor implements TemplateHeadProcessor {
 
                 log.debug("SafeRedirect: injected link-intercept script into <head>.");
             })
-            .then();
+            .then()
+            .onErrorResume(e -> {
+                log.error("SafeRedirect: failed to process head injection, skipping.", e);
+                return Mono.empty();
+            });
     }
 
     /**
