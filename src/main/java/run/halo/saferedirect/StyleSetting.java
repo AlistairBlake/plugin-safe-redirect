@@ -1,6 +1,5 @@
 package run.halo.saferedirect;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
 
 /**
