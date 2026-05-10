@@ -8,11 +8,27 @@ import lombok.Data;
 @Data
 public class StyleSetting {
     private String theme = "dream";
-    private int countdown = 5;
-    private boolean showTargetUrl = true;
-    private boolean showQrCode = false;
+    private String countdown = "5";
+    private String showTargetUrl = "true";
+    private String showQrCode = "false";
     private String iconUrl = "";
     private String customHtml = "";
     private String backgroundUrl = "";
     private String backgroundColor = "";
+
+    public int getCountdown() {
+        try {
+            return Integer.parseInt(countdown);
+        } catch (NumberFormatException e) {
+            return 5;
+        }
+    }
+
+    public boolean isShowTargetUrl() {
+        return "true".equals(showTargetUrl);
+    }
+
+    public boolean isShowQrCode() {
+        return "true".equals(showQrCode);
+    }
 }

@@ -9,5 +9,9 @@ import lombok.Data;
 public class AdvancedSetting {
     private String customCss = "";
     private String customTip = "";
-    private boolean trackOutbound = false;
+    private String trackOutbound = "false";
+
+    public boolean isTrackOutbound() {
+        return "true".equals(trackOutbound);
+    }
 }
