@@ -45,12 +45,10 @@ spec:
           name: theme
           label: 跳转页面主题
           help: 选择安全跳转中间页的视觉主题
-          value: "dream"
+          value: "minimal"
           options:
-            - value: "dream"
-              label: "默认 - Dream 毛玻璃中转页"
             - value: "minimal"
-              label: "⬜ 极简 - 纯净白色风格"
+              label: "⬜ 极简 - 纯净白色风格（默认）"
             - value: "tech"
               label: "🌌 科技 - 深色渐变风格"
             - value: "warm"

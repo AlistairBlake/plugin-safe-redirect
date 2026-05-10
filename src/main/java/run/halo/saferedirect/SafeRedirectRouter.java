@@ -311,17 +311,7 @@ public class SafeRedirectRouter {
      */
     private String buildCountdownHtml(int countdown, String theme) {
         if (countdown <= 0) return "";
-        
-        if ("dream".equals(theme)) {
-            return """
-                    <div class="sr-countdown-wrapper">
-                      <div class="sr-countdown" id="progress-bar"></div>
-                      <div class="countdown-text">
-                        <i>⚡</i><span id="countdown-text-tip">将在 <span id="countdown-num">%d</span> 秒后跳转，请自行确认链接安全性</span>
-                      </div>
-                    </div>""".formatted(countdown);
-        }
-        
+
         return """
                 <div class="sr-countdown mt-4">
                   <div class="sr-countdown-icon">⏱</div>
@@ -395,12 +385,6 @@ public class SafeRedirectRouter {
     private String buildCountdownJs(int seconds, String targetUrl, String theme) {
         String escaped = targetUrl.replace("'", "\\'").replace("\"", "&quot;");
 
-        // Dream 主题使用进度条动画
-        if ("dream".equals(theme)) {
-            return buildDreamCountdownJs(seconds, escaped);
-        }
-
-        // 其他主题使用传统倒计时 + 粒子动画
         return """
             <script>
               (function() {
@@ -501,69 +485,6 @@ public class SafeRedirectRouter {
     }
 
     /**
-     * Dream 主题专用的进度条倒计时 JS
-     * <p>
-     * 特点：
-     * - 使用 CSS 进度条动画代替数字倒计时
-     * - 进度条从 0% 平滑过渡到 100%
-     * - 支持用户点击按钮立即跳转
-     *
-     * @param seconds 倒计时秒数
-     * @param escapedTargetUrl 已转义的目标 URL
-     */
-    private String buildDreamCountdownJs(int seconds, String escapedTargetUrl) {
-        return """
-            <script>
-              (function() {
-                var remaining = %d;
-                var countdownElement = document.getElementById('countdown-num');
-                var countdownTextTip = document.getElementById('countdown-text-tip');
-                var progressBar = document.getElementById('progress-bar');
-                var btn = document.getElementById('confirm-btn');
-
-                // 初始化进度条
-                if (progressBar) {
-                  progressBar.style.setProperty('--progress-width', '0%%');
-                  // 强制重绘以触发 transition
-                  void progressBar.offsetWidth;
-                  progressBar.style.setProperty('--progress-width', '100%%');
-                  progressBar.style.transition = 'width %ds linear';
-                }
-
-                var timer = setInterval(function() {
-                  remaining--;
-                  if (countdownElement) countdownElement.textContent = remaining;
-                  if (remaining <= 0) {
-                    clearInterval(timer);
-                    if (countdownTextTip) countdownTextTip.textContent = '正在跳转...';
-                    if (progressBar) {
-                      progressBar.style.setProperty('--progress-width', '100%%');
-                      progressBar.style.transition = 'none';
-                    }
-                    setTimeout(function() {
-                      window.location.href = '%s';
-                    }, 100);
-                  }
-                }, 1000);
-
-                // 用户主动点击时清除倒计时并立即跳转
-                if (btn) {
-                  btn.addEventListener('click', function() {
-                    clearInterval(timer);
-                    if (countdownElement) countdownElement.textContent = '0';
-                    if (countdownTextTip) countdownTextTip.textContent = '正在跳转...';
-                    if (progressBar) {
-                      progressBar.style.setProperty('--progress-width', '100%%');
-                      progressBar.style.transition = 'none';
-                    }
-                  });
-                }
-              })();
-            </script>
-            """.formatted(seconds, seconds, escapedTargetUrl);
-    }
-
-    /**
      * HTML 转义，防止 XSS
      */
     private String escapeHtml(String input) {
@@ -606,8 +527,8 @@ public class SafeRedirectRouter {
      * 构建主题样式
      */
     private String buildThemeStyles(String theme) {
-        if (theme == null) theme = "dream";
-        
+        if (theme == null) theme = "minimal";
+
         switch (theme) {
             case "minimal":
                 return """
@@ -722,315 +643,6 @@ public class SafeRedirectRouter {
                     }
                     """;
 
-            case "dream":
-                return """
-                    /* Dream 主题 - 毛玻璃梦幻风格 */
-                    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-                    html {
-                        --theme: #abedd8;
-                        --title: #333333;
-                        --main: #555555;
-                        --dark-a: #555555;
-                        --light-b: #e8eef5;
-                    }
-
-                    body {
-                        margin: 0;
-                        padding: 0;
-                        overflow: hidden;
-                        position: relative;
-                        width: 100vw;
-                        height: 100vh;
-                        font-family: Arial, sans-serif;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        background-position: center;
-                        background-size: cover;
-                        background-repeat: no-repeat;
-                        background-image: linear-gradient(135deg, #a0a0a0 0%, #8c8c8c 100%), var(--back-img-url, none);
-                        background-blend-mode: overlay;
-                    }
-                    canvas { display: none; }
-
-                    /* 夜间模式 body */
-                    html.night body {
-                        background-image: linear-gradient(135deg, #364f6b 0%, #222831 100%), var(--back-img-url, none);
-                        background-blend-mode: overlay;
-                    }
-
-                    /* 毛玻璃卡片主体 */
-                    .sr-card {
-                        text-align: center;
-                        padding: 35px;
-                        border-radius: 24px;
-                        animation: fadein 0.3s ease-out;
-                        width: 400px;
-                        max-width: 90%;
-                        border: 2px solid rgba(255, 255, 255, 0.4);
-                        background: rgba(255, 255, 255, 0.85);
-                        backdrop-filter: blur(25px);
-                        -webkit-backdrop-filter: blur(25px);
-                        box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
-                        position: relative;
-                        z-index: 2;
-                        isolation: isolate;
-                    }
-
-                    /* 卡片光晕边框效果 */
-                    .sr-card::before {
-                        content: '';
-                        position: absolute;
-                        top: -6px;
-                        left: -6px;
-                        right: -6px;
-                        bottom: -6px;
-                        border-radius: 26px;
-                        background: linear-gradient(145deg,
-                            rgba(255,255,255,0.3) 0%,
-                            rgba(255,255,255,0.1) 100%);
-                        z-index: -1;
-                    }
-
-                    /* 夜间模式卡片 */
-                    html.night .sr-card {
-                        background: rgba(57, 62, 70, 0.85);
-                        border-color: rgba(255, 255, 255, 0.15);
-                        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-                    }
-
-                    html.night .sr-card::before {
-                        background: linear-gradient(145deg,
-                            rgba(255,255,255,0.1) 0%,
-                            rgba(255,255,255,0.05) 100%);
-                    }
-
-                    /* 圆形图标容器 */
-                    .sr-icon-container {
-                        width: 100px;
-                        height: 100px;
-                        margin: 0 auto 15px auto;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        border-radius: 50%;
-                        border: 3px solid rgba(255, 255, 255, 0.3);
-                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-                        transition: transform 0.3s ease;
-                    }
-
-                    .sr-icon-container:hover {
-                        transform: scale(1.05);
-                    }
-
-                    .sr-icon-svg { width: 50px; height: 50px; color: var(--theme); }
-                    .sr-icon-img { width: 94px; height: 94px; object-fit: contain; border-radius: 50%; }
-
-                    /* 标题样式 */
-                    .sr-title {
-                        margin-bottom: 20px;
-                        font-size: 20px;
-                        font-weight: bold;
-                        color: var(--title);
-                        text-align: center;
-                        animation: fadein 0.3s ease-out 0.1s both;
-                    }
-
-                    /* 提示文字 */
-                    .sr-tip {
-                        margin-bottom: 10px;
-                        line-height: 1.2rem;
-                        font-size: 16px;
-                        letter-spacing: 1px;
-                        color: var(--main);
-                        word-wrap: break-word;
-                        white-space: pre-wrap;
-                        overflow: hidden;
-                        animation: fadein 0.3s ease-out 0.15s both;
-                    }
-
-                    .sr-tip strong { color: var(--theme); font-weight: 600; }
-
-                    /* URL 显示区域 */
-                    .sr-url-container {
-                        border: 1px solid var(--light-b);
-                        backdrop-filter: blur(10px);
-                        -webkit-backdrop-filter: blur(10px);
-                        font-size: 14px;
-                        display: block;
-                        margin-top: 5px;
-                        margin-bottom: 25px;
-                        padding: 15px;
-                        border-radius: 8px;
-                        background-color: #F7F9FE;
-                        color: var(--dark-a);
-                        animation: fadein 0.3s ease-out 0.2s both;
-                    }
-
-                    .sr-url-label {
-                        font-size: 11px;
-                        color: var(--theme);
-                        text-transform: uppercase;
-                        letter-spacing: 0.5px;
-                        margin-bottom: 8px;
-                        display: block;
-                    }
-
-                    .sr-url-text {
-                        font-size: 12px;
-                        color: #4b5563;
-                        font-family: 'Monaco', 'Courier New', monospace;
-                        word-break: break-all;
-                        display: block;
-                    }
-
-                    /* 二维码 */
-                    .sr-qrcode {
-                        text-align: center;
-                        margin-bottom: 25px;
-                        animation: fadein 0.3s ease-out 0.25s both;
-                    }
-                    .sr-qrcode-label { font-size: 11px; color: var(--theme); margin-bottom: 8px; }
-                    .sr-qrcode-img {
-                        border: 2px solid rgba(171, 237, 216, 0.3);
-                        border-radius: 12px;
-                        box-shadow: 0 4px 12px rgba(171, 237, 216, 0.2);
-                    }
-
-                    /* 进度条倒计时（Dream 特色） */
-                    .sr-countdown-wrapper {
-                        margin-top: 20px;
-                        margin-bottom: 15px;
-                        animation: fadein 0.3s ease-out 0.3s both;
-                    }
-
-                    .sr-countdown {
-                        width: 100%;
-                        border-radius: 5px;
-                        overflow: hidden;
-                        height: 10px;
-                        background: rgba(255, 255, 255, 0.1);
-                        backdrop-filter: blur(5px);
-                        -webkit-backdrop-filter: blur(5px);
-                        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-                        position: relative;
-                    }
-
-                    .sr-countdown::after {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        height: 100%;
-                        width: var(--progress-width, 0%);
-                        background-color: var(--theme);
-                        transition: width linear;
-                        border-radius: 5px;
-                        box-shadow: 0 0 10px rgba(171, 237, 216, 0.5);
-                    }
-
-                    .countdown-text {
-                        margin-top: 12px;
-                        font-size: 12px;
-                        color: var(--main);
-                        text-align: center;
-                        white-space: normal;
-                        word-wrap: break-word;
-                        overflow-wrap: break-word;
-                        align-items: baseline;
-                    }
-
-                    .countdown-text i {
-                        font-size: 1.15em;
-                        color: #FF9800;
-                    }
-
-                    .sr-countdown-icon { display: none; }
-                    .sr-countdown-text {
-                        margin-top: 12px;
-                        font-size: 12px;
-                        color: var(--main);
-                        text-align: center;
-                    }
-
-                    #countdown-num {
-                        font-weight: bold;
-                        color: var(--theme);
-                    }
-
-                    /* 按钮组 */
-                    .sr-buttons {
-                        display: flex;
-                        justify-content: center;
-                        gap: 20%;
-                        margin-top: 20px;
-                        animation: fadein 0.3s ease-out 0.35s both;
-                    }
-
-                    .sr-btn {
-                        box-shadow: 0 2px 6px var(--theme);
-                        will-change: transform, opacity;
-                        padding: 10px 20px;
-                        border-radius: 16px;
-                        border: none;
-                        font-size: 16px;
-                        width: 70px;
-                        height: 20px;
-                        text-align: center;
-                        text-decoration: none;
-                        color: #fefefe;
-                        background: var(--theme);
-                        backdrop-filter: blur(4px);
-                        -webkit-backdrop-filter: blur(4px);
-                        transition: all 0.3s ease;
-                        line-height: 20px;
-                        backface-visibility: hidden;
-                        transform: translateZ(0);
-                        cursor: pointer;
-                    }
-
-                    .sr-btn-primary:hover {
-                        background: var(--theme);
-                        box-shadow: 0 3px 8px var(--theme);
-                    }
-
-                    .sr-btn-secondary {
-                        background: transparent;
-                        color: #999999;
-                        border: 2px solid rgba(0, 0, 0, 0.1);
-                        box-shadow: none;
-                    }
-
-                    .sr-btn-secondary:hover {
-                        border-color: var(--theme);
-                        color: var(--theme);
-                        background: rgba(171, 237, 216, 0.1);
-                    }
-
-                    /* 动画 */
-                    @keyframes fadein {
-                        from { opacity: 0; transform: translateY(20px); }
-                        to { opacity: 1; transform: translateY(0); }
-                    }
-
-                    @keyframes float {
-                        0%, 100% { transform: translateY(0px); }
-                        50% { transform: translateY(-8px); }
-                    }
-
-                    /* 响应式 */
-                    @media (max-width: 768px) {
-                        .sr-card { width: 75% !important; max-width: 400px !important; }
-                    }
-
-                    @media (max-width: 480px) {
-                        .sr-card { padding: 24px; }
-                        .sr-title { font-size: 18px; }
-                        .sr-buttons { flex-direction: column; gap: 12px; }
-                    }
-                    """;
-
             case "custom":
                 return """
                     /* 自定义主题 - 使用自定义 CSS */
@@ -1039,9 +651,9 @@ public class SafeRedirectRouter {
                     """;
 
             default:
-                // 兜底：未知主题名时回退到 Dream 主题
-                log.warn("Unknown theme '{}', falling back to 'dream'", theme);
-                return buildThemeStyles("dream");
+                // 兜底：未知主题名时回退到极简主题
+                log.warn("Unknown theme '{}', falling back to 'minimal'", theme);
+                return buildThemeStyles("minimal");
         }
     }
 
