@@ -110,6 +110,19 @@ spec:
           help: 完全替换默认跳转页面，支持变量：{url}=目标链接, {sitename}=网站名称。留空则使用默认模板。
           value: ""
 
+        - $formkit: select
+          name: buttonMode
+          label: 按钮设置
+          help: 选择安全跳转页面显示的按钮组合方式
+          value: "both"
+          options:
+            - value: "both"
+              label: "立即跳转 + 返回上页（默认）"
+            - value: "redirect_close"
+              label: "立即跳转 + 关闭界面"
+            - value: "redirect_only"
+              label: "仅显示立即跳转"
+
     - group: advanced
       label: 高级设置
       formSchema:

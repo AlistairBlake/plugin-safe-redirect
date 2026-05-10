@@ -230,6 +230,7 @@ public class SafeRedirectRouter {
         String themeStyles = buildThemeStyles(style.getTheme());
         String backgroundOverride = buildBackgroundOverride(style.getBackgroundUrl(), style.getBackgroundColor());
         String iconHtml = buildIconHtml(style.getIconUrl());
+        String buttonHtml = buildButtonHtml(targetUrl, style.getButtonMode());
 
         return """
             <!DOCTYPE html>
@@ -254,8 +255,8 @@ public class SafeRedirectRouter {
                 #countdown-num { font-weight: 700; color: #f59e0b; }
 
                 /* 按钮 */
-                .sr-buttons { display: flex; gap: 12px; margin-top: 24px; animation: fadeInUp 0.6s ease-out 0.3s both; }
-                .sr-btn { flex: 1; padding: 14px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+                .sr-buttons { display: flex; gap: 12px; margin-top: 24px; animation: fadeInUp 0.6s ease-out 0.3s both; justify-content: center; }
+                .sr-btn { flex: 1; max-width: 280px; padding: 14px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; }
                 .sr-btn-primary { background: linear-gradient(135deg, #3B82F6 0%%, #2563eb 100%%); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
                 .sr-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); }
                 .sr-btn-secondary { background: transparent; color: #6b7280; border: 2px solid #e5e7eb; }
@@ -270,7 +271,8 @@ public class SafeRedirectRouter {
                 @media (max-width: 480px) {
                   .sr-card { padding: 24px; }
                   .sr-title { font-size: 20px; }
-                  .sr-buttons { flex-direction: column; }
+                  .sr-buttons { flex-direction: column; align-items: stretch; }
+                  .sr-btn { max-width: 100%; }
                 }
               </style>
               %s
@@ -284,10 +286,7 @@ public class SafeRedirectRouter {
             %s
             %s
             %s
-                <div class="sr-buttons">
-                  <a href="%s" rel="noopener noreferrer nofollow" id="confirm-btn" class="sr-btn sr-btn-primary">确认跳转</a>
-                  <a href="javascript:history.back()" class="sr-btn sr-btn-secondary">返回上页</a>
-                </div>
+            %s
               </div>
             </body>
             </html>
@@ -302,7 +301,7 @@ public class SafeRedirectRouter {
                 urlDisplayHtmlUI,
                 qrCodeHtmlUI,
                 countdownHtmlUI,
-                escapeHtml(targetUrl)
+                buttonHtml
             );
     }
 
@@ -359,6 +358,43 @@ public class SafeRedirectRouter {
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" class="sr-icon-path"/>
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" class="sr-icon-path"/>
             </svg>""";
+    }
+
+    /**
+     * 根据按钮模式构建按钮 HTML
+     * <p>
+     * 支持三种模式：
+     * <ul>
+     *   <li>both - 显示"立即跳转"和"返回上页"两个按钮</li>
+     *   <li>redirect_close - 显示"立即跳转"和"关闭界面"两个按钮</li>
+     *   <li>redirect_only - 仅显示"立即跳转"按钮</li>
+     * </ul>
+     */
+    private String buildButtonHtml(String targetUrl, String buttonMode) {
+        String escapedUrl = escapeHtml(targetUrl);
+
+        switch (buttonMode) {
+            case "redirect_close":
+                return """
+                    <div class="sr-buttons">
+                      <a href="%s" rel="noopener noreferrer nofollow" id="confirm-btn" class="sr-btn sr-btn-primary">立即跳转</a>
+                      <a href="javascript:window.close()" class="sr-btn sr-btn-secondary">关闭界面</a>
+                    </div>""".formatted(escapedUrl);
+
+            case "redirect_only":
+                return """
+                    <div class="sr-buttons">
+                      <a href="%s" rel="noopener noreferrer nofollow" id="confirm-btn" class="sr-btn sr-btn-primary">立即跳转</a>
+                    </div>""".formatted(escapedUrl);
+
+            case "both":
+            default:
+                return """
+                    <div class="sr-buttons">
+                      <a href="%s" rel="noopener noreferrer nofollow" id="confirm-btn" class="sr-btn sr-btn-primary">立即跳转</a>
+                      <a href="javascript:history.back()" class="sr-btn sr-btn-secondary">返回上页</a>
+                    </div>""".formatted(escapedUrl);
+        }
     }
 
     /**
@@ -553,8 +589,8 @@ public class SafeRedirectRouter {
                     .sr-countdown-icon { font-size: 16px; }
                     .sr-countdown-text { font-size: 14px; color: #4b5563; }
                     #countdown-num { font-weight: 600; color: #1f2937; }
-                    .sr-buttons { display: flex; gap: 12px; margin-top: 24px; animation: fadeInUp 0.6s ease-out 0.3s both; }
-                    .sr-btn { flex: 1; padding: 12px 20px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; }
+                    .sr-buttons { display: flex; gap: 12px; margin-top: 24px; animation: fadeInUp 0.6s ease-out 0.3s both; justify-content: center; }
+                    .sr-btn { flex: 1; max-width: 280px; padding: 12px 20px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; }
                     .sr-btn-primary { background: #1f2937; color: white; }
                     .sr-btn-primary:hover { background: #374151; }
                     .sr-btn-secondary { background: #ffffff; color: #6b7280; border: 2px solid #e5e7eb; }
@@ -563,7 +599,8 @@ public class SafeRedirectRouter {
                     @media (max-width: 480px) {
                       .sr-card { padding: 24px; }
                       .sr-title { font-size: 18px; }
-                      .sr-buttons { flex-direction: column; }
+                      .sr-buttons { flex-direction: column; align-items: stretch; }
+                      .sr-btn { max-width: 100%; }
                     }
                     """;
                 
@@ -590,18 +627,19 @@ public class SafeRedirectRouter {
                     .sr-countdown-icon { font-size: 16px; }
                     .sr-countdown-text { font-size: 13px; color: #00f0ff; }
                     #countdown-num { font-weight: 700; color: #00f0ff; }
-                    .sr-buttons { display: flex; gap: 12px; margin-top: 24px; animation: fadeInUp 0.6s ease-out 0.3s both; }
-                    .sr-btn { flex: 1; padding: 14px 24px; border: 2px solid #00f0ff; border-radius: 4px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; }
+                    .sr-buttons { display: flex; gap: 12px; margin-top: 24px; animation: fadeInUp 0.6s ease-out 0.3s both; justify-content: center; }
+                    .sr-btn { flex: 1; max-width: 280px; padding: 14px 24px; border: 2px solid #00f0ff; border-radius: 4px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; text-align: center; display: inline-flex; align-items: center; justify-content: center; }
                     .sr-btn-primary { background: #00f0ff; color: #0f0f23; }
                     .sr-btn-primary:hover { background: #00c8d4; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
                     .sr-btn-secondary { background: transparent; color: #00f0ff; }
                     .sr-btn-secondary:hover { background: rgba(0, 240, 255, 0.1); }
                     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-                    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+                    @keyframes float { 0%, 100% { transform: translateY(0px); } 50%% { transform: translateY(-8px); } }
                     @media (max-width: 480px) {
                       .sr-card { padding: 24px; }
                       .sr-title { font-size: 16px; }
-                      .sr-buttons { flex-direction: column; }
+                      .sr-buttons { flex-direction: column; align-items: stretch; }
+                      .sr-btn { max-width: 100%; }
                     }
                     """;
                 
@@ -628,18 +666,19 @@ public class SafeRedirectRouter {
                     .sr-countdown-icon { font-size: 18px; }
                     .sr-countdown-text { font-size: 14px; color: #9a3412; }
                     #countdown-num { font-weight: 700; color: #f97316; }
-                    .sr-buttons { display: flex; gap: 12px; margin-top: 24px; animation: fadeInUp 0.6s ease-out 0.3s both; }
-                    .sr-btn { flex: 1; padding: 14px 24px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+                    .sr-buttons { display: flex; gap: 12px; margin-top: 24px; animation: fadeInUp 0.6s ease-out 0.3s both; justify-content: center; }
+                    .sr-btn { flex: 1; max-width: 280px; padding: 14px 24px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; }
                     .sr-btn-primary { background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%); color: white; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
                     .sr-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4); }
                     .sr-btn-secondary { background: #ffffff; color: #6b7280; border: 2px solid #fed7aa; }
                     .sr-btn-secondary:hover { border-color: #f97316; color: #f97316; background: #fff7ed; }
                     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-                    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+                    @keyframes float { 0%, 100% { transform: translateY(0px); } 50%% { transform: translateY(-8px); } }
                     @media (max-width: 480px) {
                       .sr-card { padding: 24px; }
                       .sr-title { font-size: 20px; }
-                      .sr-buttons { flex-direction: column; }
+                      .sr-buttons { flex-direction: column; align-items: stretch; }
+                      .sr-btn { max-width: 100%; }
                     }
                     """;
 

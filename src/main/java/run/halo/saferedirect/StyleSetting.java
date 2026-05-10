@@ -15,6 +15,7 @@ public class StyleSetting {
     private Object customHtml = "";
     private Object backgroundUrl = "";
     private Object backgroundColor = "";
+    private Object buttonMode = "both";
 
     public String getTheme() {
         return theme == null ? "minimal" : String.valueOf(theme);
@@ -34,6 +35,10 @@ public class StyleSetting {
 
     public String getBackgroundColor() {
         return backgroundColor == null ? "" : String.valueOf(backgroundColor);
+    }
+
+    public String getButtonMode() {
+        return buttonMode == null ? "both" : String.valueOf(buttonMode);
     }
 
     public int getCountdown() {
