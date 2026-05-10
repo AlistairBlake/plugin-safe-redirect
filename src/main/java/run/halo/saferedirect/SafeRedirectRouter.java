@@ -314,11 +314,13 @@ public class SafeRedirectRouter {
         
         if ("dream".equals(theme)) {
             return """
-                    <div class="sr-countdown" id="progress-bar"></div>
-                                    <div class="countdown-text">
-                                      <span style="color: #FF9800; margin-right: 4px;">⚡</span>
-                                      <span id="countdown-text-tip">将在 <span id="countdown-num">%d</span> 秒后自动跳转</span>
-                                    </div>""".formatted(countdown);
+                    <div class="sr-countdown-wrapper">
+                      <div class="sr-countdown" id="progress-bar"></div>
+                      <div class="countdown-text">
+                        <span style="color: #abedd8; margin-right: 4px;">⚡</span>
+                        <span id="countdown-text-tip">将在 <span id="countdown-num">%d</span> 秒后自动跳转</span>
+                      </div>
+                    </div>""".formatted(countdown);
         }
         
         return """
@@ -866,19 +868,22 @@ public class SafeRedirectRouter {
                     }
 
                     /* 进度条倒计时（Dream 特色） */
+                    .sr-countdown-wrapper {
+                        margin-top: 20px;
+                        margin-bottom: 15px;
+                        animation: fadein 0.3s ease-out 0.3s both;
+                    }
+
                     .sr-countdown {
                         width: 100%;
                         border-radius: 5px;
                         overflow: hidden;
                         height: 10px;
-                        margin-top: 20px;
-                        margin-bottom: 15px;
                         background: rgba(255, 255, 255, 0.1);
                         backdrop-filter: blur(5px);
                         -webkit-backdrop-filter: blur(5px);
                         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
                         position: relative;
-                        animation: fadein 0.3s ease-out 0.3s both;
                     }
 
                     .sr-countdown::after {
@@ -894,6 +899,17 @@ public class SafeRedirectRouter {
                         box-shadow: 0 0 10px rgba(171, 237, 216, 0.5);
                     }
 
+                    .countdown-text {
+                        margin-top: 12px;
+                        font-size: 14px;
+                        color: #666666;
+                        text-align: center;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 4px;
+                    }
+
                     .sr-countdown-icon { display: none; }
                     .sr-countdown-text {
                         margin-top: 12px;
@@ -905,7 +921,7 @@ public class SafeRedirectRouter {
                     #countdown-num {
                         font-weight: bold;
                         color: #abedd8;
-                        font-size: 14px;
+                        font-size: 16px;
                     }
 
                     /* 按钮组 */
