@@ -317,8 +317,7 @@ public class SafeRedirectRouter {
                     <div class="sr-countdown-wrapper">
                       <div class="sr-countdown" id="progress-bar"></div>
                       <div class="countdown-text">
-                        <span style="color: #abedd8; margin-right: 4px;">⚡</span>
-                        <span id="countdown-text-tip">将在 <span id="countdown-num">%d</span> 秒后自动跳转</span>
+                        <i>⚡</i><span id="countdown-text-tip">将在 <span id="countdown-num">%d</span> 秒后跳转，请自行确认链接安全性</span>
                       </div>
                     </div>""".formatted(countdown);
         }
@@ -727,20 +726,39 @@ public class SafeRedirectRouter {
                 return """
                     /* Dream 主题 - 毛玻璃梦幻风格 */
                     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+                    html {
+                        --theme: #abedd8;
+                        --title: #333333;
+                        --main: #555555;
+                        --dark-a: #555555;
+                        --light-b: #e8eef5;
+                    }
+
                     body {
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                        background-image: linear-gradient(135deg, #a0a0a0 0%, #8c8c8c 100%);
-                        background-position: center;
-                        background-size: cover;
-                        background-repeat: no-repeat;
-                        min-height: 100vh;
+                        margin: 0;
+                        padding: 0;
+                        overflow: hidden;
+                        position: relative;
+                        width: 100vw;
+                        height: 100vh;
+                        font-family: Arial, sans-serif;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 20px;
-                        overflow-x: hidden;
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        background-image: linear-gradient(135deg, #a0a0a0 0%, #8c8c8c 100%), var(--back-img-url, none);
+                        background-blend-mode: overlay;
                     }
                     canvas { display: none; }
+
+                    /* 夜间模式 body */
+                    html.night body {
+                        background-image: linear-gradient(135deg, #364f6b 0%, #222831 100%), var(--back-img-url, none);
+                        background-blend-mode: overlay;
+                    }
 
                     /* 毛玻璃卡片主体 */
                     .sr-card {
@@ -775,6 +793,19 @@ public class SafeRedirectRouter {
                         z-index: -1;
                     }
 
+                    /* 夜间模式卡片 */
+                    html.night .sr-card {
+                        background: rgba(57, 62, 70, 0.85);
+                        border-color: rgba(255, 255, 255, 0.15);
+                        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+                    }
+
+                    html.night .sr-card::before {
+                        background: linear-gradient(145deg,
+                            rgba(255,255,255,0.1) 0%,
+                            rgba(255,255,255,0.05) 100%);
+                    }
+
                     /* 圆形图标容器 */
                     .sr-icon-container {
                         width: 100px;
@@ -787,44 +818,43 @@ public class SafeRedirectRouter {
                         border: 3px solid rgba(255, 255, 255, 0.3);
                         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
                         transition: transform 0.3s ease;
-                        background: linear-gradient(135deg, #abedd8 0%, #74ebd5 100%);
                     }
 
                     .sr-icon-container:hover {
                         transform: scale(1.05);
                     }
 
-                    .sr-icon-svg { width: 50px; height: 50px; color: white; }
+                    .sr-icon-svg { width: 50px; height: 50px; color: var(--theme); }
                     .sr-icon-img { width: 94px; height: 94px; object-fit: contain; border-radius: 50%; }
 
                     /* 标题样式 */
                     .sr-title {
+                        margin-bottom: 20px;
                         font-size: 20px;
                         font-weight: bold;
-                        color: #333333;
+                        color: var(--title);
                         text-align: center;
-                        margin-bottom: 20px;
                         animation: fadein 0.3s ease-out 0.1s both;
                     }
 
                     /* 提示文字 */
                     .sr-tip {
-                        font-size: 16px;
-                        line-height: 1.5;
-                        color: #555555;
-                        text-align: center;
                         margin-bottom: 10px;
+                        line-height: 1.2rem;
+                        font-size: 16px;
                         letter-spacing: 1px;
-                        animation: fadein 0.3s ease-out 0.15s both;
+                        color: var(--main);
                         word-wrap: break-word;
                         white-space: pre-wrap;
+                        overflow: hidden;
+                        animation: fadein 0.3s ease-out 0.15s both;
                     }
 
-                    .sr-tip strong { color: #abedd8; font-weight: 600; }
+                    .sr-tip strong { color: var(--theme); font-weight: 600; }
 
                     /* URL 显示区域 */
                     .sr-url-container {
-                        border: 1px solid #e8eef5;
+                        border: 1px solid var(--light-b);
                         backdrop-filter: blur(10px);
                         -webkit-backdrop-filter: blur(10px);
                         font-size: 14px;
@@ -834,12 +864,13 @@ public class SafeRedirectRouter {
                         padding: 15px;
                         border-radius: 8px;
                         background-color: #F7F9FE;
+                        color: var(--dark-a);
                         animation: fadein 0.3s ease-out 0.2s both;
                     }
 
                     .sr-url-label {
                         font-size: 11px;
-                        color: #abedd8;
+                        color: var(--theme);
                         text-transform: uppercase;
                         letter-spacing: 0.5px;
                         margin-bottom: 8px;
@@ -860,7 +891,7 @@ public class SafeRedirectRouter {
                         margin-bottom: 25px;
                         animation: fadein 0.3s ease-out 0.25s both;
                     }
-                    .sr-qrcode-label { font-size: 11px; color: #abedd8; margin-bottom: 8px; }
+                    .sr-qrcode-label { font-size: 11px; color: var(--theme); margin-bottom: 8px; }
                     .sr-qrcode-img {
                         border: 2px solid rgba(171, 237, 216, 0.3);
                         border-radius: 12px;
@@ -893,7 +924,7 @@ public class SafeRedirectRouter {
                         left: 0;
                         height: 100%;
                         width: var(--progress-width, 0%);
-                        background-color: #abedd8;
+                        background-color: var(--theme);
                         transition: width linear;
                         border-radius: 5px;
                         box-shadow: 0 0 10px rgba(171, 237, 216, 0.5);
@@ -901,27 +932,31 @@ public class SafeRedirectRouter {
 
                     .countdown-text {
                         margin-top: 12px;
-                        font-size: 14px;
-                        color: #666666;
+                        font-size: 12px;
+                        color: var(--main);
                         text-align: center;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        gap: 4px;
+                        white-space: normal;
+                        word-wrap: break-word;
+                        overflow-wrap: break-word;
+                        align-items: baseline;
+                    }
+
+                    .countdown-text i {
+                        font-size: 1.15em;
+                        color: #FF9800;
                     }
 
                     .sr-countdown-icon { display: none; }
                     .sr-countdown-text {
                         margin-top: 12px;
                         font-size: 12px;
-                        color: #666666;
+                        color: var(--main);
                         text-align: center;
                     }
 
                     #countdown-num {
                         font-weight: bold;
-                        color: #abedd8;
-                        font-size: 16px;
+                        color: var(--theme);
                     }
 
                     /* 按钮组 */
@@ -934,29 +969,30 @@ public class SafeRedirectRouter {
                     }
 
                     .sr-btn {
-                        padding: 10px 24px;
+                        box-shadow: 0 2px 6px var(--theme);
+                        will-change: transform, opacity;
+                        padding: 10px 20px;
                         border-radius: 16px;
                         border: none;
                         font-size: 16px;
-                        font-weight: 500;
-                        cursor: pointer;
+                        width: 70px;
+                        height: 20px;
+                        text-align: center;
                         text-decoration: none;
-                        color: #ffffff;
-                        background: linear-gradient(135deg, #abedd8 0%, #74ebd5 100%);
+                        color: #fefefe;
+                        background: var(--theme);
                         backdrop-filter: blur(4px);
                         -webkit-backdrop-filter: blur(4px);
                         transition: all 0.3s ease;
                         line-height: 20px;
                         backface-visibility: hidden;
                         transform: translateZ(0);
-                        box-shadow: 0 2px 6px rgba(171, 237, 216, 0.4);
-                        will-change: transform, opacity;
+                        cursor: pointer;
                     }
 
                     .sr-btn-primary:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 4px 12px rgba(171, 237, 216, 0.6);
-                        background: linear-gradient(135deg, #96ddb8 0%, #60d5c8 100%);
+                        background: var(--theme);
+                        box-shadow: 0 3px 8px var(--theme);
                     }
 
                     .sr-btn-secondary {
@@ -967,8 +1003,8 @@ public class SafeRedirectRouter {
                     }
 
                     .sr-btn-secondary:hover {
-                        border-color: #abedd8;
-                        color: #abedd8;
+                        border-color: var(--theme);
+                        color: var(--theme);
                         background: rgba(171, 237, 216, 0.1);
                     }
 
