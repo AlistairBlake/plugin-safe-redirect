@@ -559,7 +559,7 @@ public class SafeRedirectRouter {
                 }
               })();
             </script>
-            """.formatted(seconds, escapedTargetUrl);
+            """.formatted(seconds, seconds, escapedTargetUrl);
     }
 
     /**
@@ -614,10 +614,10 @@ public class SafeRedirectRouter {
                     * { box-sizing: border-box; margin: 0; padding: 0; }
                     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ffffff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
                     canvas { display: none; }
-                    .sr-card { background: #ffffff; border: 2px solid #e5e7eb; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); max-width: 480px; width: 100%%; padding: 40px; animation: fadeInUp 0.6s ease-out; }
-                    .sr-icon-container { width: 80px; height: 80px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-radius: 50%%; }
+                    .sr-card { background: #ffffff; border: 2px solid #e5e7eb; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); max-width: 480px; width: 100%; padding: 40px; animation: fadeInUp 0.6s ease-out; }
+                    .sr-icon-container { width: 80px; height: 80px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-radius: 50%; }
                     .sr-icon-svg { width: 40px; height: 40px; color: #6b7280; }
-                    .sr-icon-img { width: 48px; height: 48px; object-fit: contain; border-radius: 50%%; }
+                    .sr-icon-img { width: 48px; height: 48px; object-fit: contain; border-radius: 50%; }
                     .sr-title { font-size: 22px; font-weight: 600; color: #1f2937; text-align: center; margin-bottom: 12px; animation: fadeInUp 0.6s ease-out 0.1s both; }
                     .sr-tip { font-size: 14px; color: #6b7280; text-align: center; line-height: 1.6; margin-bottom: 24px; animation: fadeInUp 0.6s ease-out 0.1s both; }
                     .sr-tip strong { color: #1f2937; font-weight: 600; }
@@ -649,9 +649,9 @@ public class SafeRedirectRouter {
                 return """
                     /* 科技主题 */
                     * { box-sizing: border-box; margin: 0; padding: 0; }
-                    body { font-family: 'Courier New', monospace; background: linear-gradient(135deg, #0f0f23 0%%, #1a1a2e 100%%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-                    canvas { position: fixed; top: 0; left: 0; width: 100%%; height: 100%%; z-index: -1; }
-                    .sr-card { background: rgba(26, 26, 46, 0.9); border: 1px solid #00f0ff; border-radius: 4px; box-shadow: 0 0 30px rgba(0, 240, 255, 0.2); max-width: 480px; width: 100%%; padding: 40px; animation: fadeInUp 0.6s ease-out; backdrop-filter: blur(10px); }
+                    body { font-family: 'Courier New', monospace; background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+                    canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+                    .sr-card { background: rgba(26, 26, 46, 0.9); border: 1px solid #00f0ff; border-radius: 4px; box-shadow: 0 0 30px rgba(0, 240, 255, 0.2); max-width: 480px; width: 100%; padding: 40px; animation: fadeInUp 0.6s ease-out; backdrop-filter: blur(10px); }
                     .sr-icon-container { width: 80px; height: 80px; margin: 0 auto 24px; animation: float 3s ease-in-out infinite; display: flex; align-items: center; justify-content: center; background: rgba(0, 240, 255, 0.1); border: 2px solid #00f0ff; border-radius: 4px; box-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
                     .sr-icon-svg { width: 40px; height: 40px; color: #00f0ff; }
                     .sr-icon-img { width: 48px; height: 48px; object-fit: contain; }
@@ -675,7 +675,7 @@ public class SafeRedirectRouter {
                     .sr-btn-secondary { background: transparent; color: #00f0ff; }
                     .sr-btn-secondary:hover { background: rgba(0, 240, 255, 0.1); }
                     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-                    @keyframes float { 0%%, 100%% { transform: translateY(0px); } 50%% { transform: translateY(-8px); } }
+                    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
                     @media (max-width: 480px) {
                       .sr-card { padding: 24px; }
                       .sr-title { font-size: 16px; }
@@ -687,10 +687,10 @@ public class SafeRedirectRouter {
                 return """
                     /* 温暖主题 */
                     * { box-sizing: border-box; margin: 0; padding: 0; }
-                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #ffecd2 0%%, #fcb69f 100%%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
                     canvas { display: none; }
-                    .sr-card { background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 40px rgba(251, 146, 60, 0.3); max-width: 480px; width: 100%%; padding: 40px; animation: fadeInUp 0.6s ease-out; backdrop-filter: blur(10px); }
-                    .sr-icon-container { width: 80px; height: 80px; margin: 0 auto 24px; animation: float 3s ease-in-out infinite; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f97316 0%%, #fbbf24 100%%); border-radius: 20px; box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4); }
+                    .sr-card { background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 40px rgba(251, 146, 60, 0.3); max-width: 480px; width: 100%; padding: 40px; animation: fadeInUp 0.6s ease-out; backdrop-filter: blur(10px); }
+                    .sr-icon-container { width: 80px; height: 80px; margin: 0 auto 24px; animation: float 3s ease-in-out infinite; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%); border-radius: 20px; box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4); }
                     .sr-icon-svg { width: 40px; height: 40px; color: white; }
                     .sr-icon-img { width: 48px; height: 48px; object-fit: contain; border-radius: 12px; }
                     .sr-title { font-size: 24px; font-weight: 700; color: #1f2937; text-align: center; margin-bottom: 12px; animation: fadeInUp 0.6s ease-out 0.1s both; }
@@ -708,12 +708,12 @@ public class SafeRedirectRouter {
                     #countdown-num { font-weight: 700; color: #f97316; }
                     .sr-buttons { display: flex; gap: 12px; margin-top: 24px; animation: fadeInUp 0.6s ease-out 0.3s both; }
                     .sr-btn { flex: 1; padding: 14px 24px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
-                    .sr-btn-primary { background: linear-gradient(135deg, #f97316 0%%, #fbbf24 100%%); color: white; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
+                    .sr-btn-primary { background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%); color: white; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
                     .sr-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4); }
                     .sr-btn-secondary { background: #ffffff; color: #6b7280; border: 2px solid #fed7aa; }
                     .sr-btn-secondary:hover { border-color: #f97316; color: #f97316; background: #fff7ed; }
                     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-                    @keyframes float { 0%%, 100%% { transform: translateY(0px); } 50%% { transform: translateY(-8px); } }
+                    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
                     @media (max-width: 480px) {
                       .sr-card { padding: 24px; }
                       .sr-title { font-size: 20px; }
@@ -727,7 +727,7 @@ public class SafeRedirectRouter {
                     * { box-sizing: border-box; margin: 0; padding: 0; }
                     body {
                         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                        background-image: linear-gradient(135deg, #a0a0a0 0%%, #8c8c8c 100%%);
+                        background-image: linear-gradient(135deg, #a0a0a0 0%, #8c8c8c 100%);
                         background-position: center;
                         background-size: cover;
                         background-repeat: no-repeat;
@@ -747,7 +747,7 @@ public class SafeRedirectRouter {
                         border-radius: 24px;
                         animation: fadein 0.3s ease-out;
                         width: 400px;
-                        max-width: 90%%;
+                        max-width: 90%;
                         border: 2px solid rgba(255, 255, 255, 0.4);
                         background: rgba(255, 255, 255, 0.85);
                         backdrop-filter: blur(25px);
@@ -768,8 +768,8 @@ public class SafeRedirectRouter {
                         bottom: -6px;
                         border-radius: 26px;
                         background: linear-gradient(145deg,
-                            rgba(255,255,255,0.3) 0%%,
-                            rgba(255,255,255,0.1) 100%%);
+                            rgba(255,255,255,0.3) 0%,
+                            rgba(255,255,255,0.1) 100%);
                         z-index: -1;
                     }
 
@@ -781,11 +781,11 @@ public class SafeRedirectRouter {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        border-radius: 50%%;
+                        border-radius: 50%;
                         border: 3px solid rgba(255, 255, 255, 0.3);
                         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
                         transition: transform 0.3s ease;
-                        background: linear-gradient(135deg, #abedd8 0%%, #74ebd5 100%%);
+                        background: linear-gradient(135deg, #abedd8 0%, #74ebd5 100%);
                     }
 
                     .sr-icon-container:hover {
@@ -793,7 +793,7 @@ public class SafeRedirectRouter {
                     }
 
                     .sr-icon-svg { width: 50px; height: 50px; color: white; }
-                    .sr-icon-img { width: 94px; height: 94px; object-fit: contain; border-radius: 50%%; }
+                    .sr-icon-img { width: 94px; height: 94px; object-fit: contain; border-radius: 50%; }
 
                     /* 标题样式 */
                     .sr-title {
@@ -867,7 +867,7 @@ public class SafeRedirectRouter {
 
                     /* 进度条倒计时（Dream 特色） */
                     .sr-countdown {
-                        width: 100%%;
+                        width: 100%;
                         border-radius: 5px;
                         overflow: hidden;
                         height: 10px;
@@ -886,8 +886,8 @@ public class SafeRedirectRouter {
                         position: absolute;
                         top: 0;
                         left: 0;
-                        height: 100%%;
-                        width: var(--progress-width, 0%%);
+                        height: 100%;
+                        width: var(--progress-width, 0%);
                         background-color: #abedd8;
                         transition: width linear;
                         border-radius: 5px;
@@ -912,7 +912,7 @@ public class SafeRedirectRouter {
                     .sr-buttons {
                         display: flex;
                         justify-content: center;
-                        gap: 20%%;
+                        gap: 20%;
                         margin-top: 20px;
                         animation: fadein 0.3s ease-out 0.35s both;
                     }
@@ -926,7 +926,7 @@ public class SafeRedirectRouter {
                         cursor: pointer;
                         text-decoration: none;
                         color: #ffffff;
-                        background: linear-gradient(135deg, #abedd8 0%%, #74ebd5 100%%);
+                        background: linear-gradient(135deg, #abedd8 0%, #74ebd5 100%);
                         backdrop-filter: blur(4px);
                         -webkit-backdrop-filter: blur(4px);
                         transition: all 0.3s ease;
@@ -940,7 +940,7 @@ public class SafeRedirectRouter {
                     .sr-btn-primary:hover {
                         transform: translateY(-2px);
                         box-shadow: 0 4px 12px rgba(171, 237, 216, 0.6);
-                        background: linear-gradient(135deg, #96ddb8 0%%, #60d5c8 100%%);
+                        background: linear-gradient(135deg, #96ddb8 0%, #60d5c8 100%);
                     }
 
                     .sr-btn-secondary {
@@ -963,13 +963,13 @@ public class SafeRedirectRouter {
                     }
 
                     @keyframes float {
-                        0%%, 100%% { transform: translateY(0px); }
-                        50%% { transform: translateY(-8px); }
+                        0%, 100% { transform: translateY(0px); }
+                        50% { transform: translateY(-8px); }
                     }
 
                     /* 响应式 */
                     @media (max-width: 768px) {
-                        .sr-card { width: 75%% !important; max-width: 400px !important; }
+                        .sr-card { width: 75% !important; max-width: 400px !important; }
                     }
 
                     @media (max-width: 480px) {
