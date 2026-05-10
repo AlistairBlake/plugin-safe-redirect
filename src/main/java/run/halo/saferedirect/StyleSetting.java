@@ -1,5 +1,6 @@
 package run.halo.saferedirect;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
 
 /**
@@ -8,27 +9,36 @@ import lombok.Data;
 @Data
 public class StyleSetting {
     private String theme = "dream";
-    private String countdown = "5";
-    private String showTargetUrl = "true";
-    private String showQrCode = "false";
+    private Object countdown = "5";
+    private Object showTargetUrl = "true";
+    private Object showQrCode = "false";
     private String iconUrl = "";
     private String customHtml = "";
     private String backgroundUrl = "";
     private String backgroundColor = "";
 
     public int getCountdown() {
+        if (countdown instanceof Number) {
+            return ((Number) countdown).intValue();
+        }
         try {
-            return Integer.parseInt(countdown);
+            return Integer.parseInt(String.valueOf(countdown));
         } catch (NumberFormatException e) {
             return 5;
         }
     }
 
     public boolean isShowTargetUrl() {
-        return "true".equals(showTargetUrl);
+        if (showTargetUrl instanceof Boolean) {
+            return (Boolean) showTargetUrl;
+        }
+        return "true".equalsIgnoreCase(String.valueOf(showTargetUrl));
     }
 
     public boolean isShowQrCode() {
-        return "true".equals(showQrCode);
+        if (showQrCode instanceof Boolean) {
+            return (Boolean) showQrCode;
+        }
+        return "true".equalsIgnoreCase(String.valueOf(showQrCode));
     }
 }

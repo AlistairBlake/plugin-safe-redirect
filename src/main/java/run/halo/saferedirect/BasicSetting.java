@@ -10,9 +10,12 @@ public class BasicSetting {
     private String pageTitle = "安全跳转提示";
     private String siteName = "我的博客";
     private String whitelistDomains = "";
-    private String enabled = "true";
+    private Object enabled = "true";
 
     public boolean isEnabled() {
-        return "true".equals(enabled);
+        if (enabled instanceof Boolean) {
+            return (Boolean) enabled;
+        }
+        return "true".equalsIgnoreCase(String.valueOf(enabled));
     }
 }

@@ -117,12 +117,20 @@ public class SafeRedirectRouter {
         }
 
         return settingFetcher.fetch("advanced", AdvancedSetting.class)
+            .onErrorResume(e -> {
+                log.warn("Failed to fetch advanced settings, using defaults: {}", e.getMessage());
+                return Mono.just(new AdvancedSetting());
+            })
             .defaultIfEmpty(new AdvancedSetting())
             .flatMap(advancedSetting -> {
                 if (advancedSetting.isTrackOutbound()) {
                     log.info("Outbound link accessed: {}", finalUrl);
                 }
                 return settingFetcher.fetch("style", StyleSetting.class)
+                    .onErrorResume(e -> {
+                        log.warn("Failed to fetch style settings, using defaults: {}", e.getMessage());
+                        return Mono.just(new StyleSetting());
+                    })
                     .defaultIfEmpty(new StyleSetting())
                     .flatMap(styleSetting -> {
                         try {
