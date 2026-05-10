@@ -7,10 +7,22 @@ import lombok.Data;
  */
 @Data
 public class BasicSetting {
-    private String pageTitle = "安全跳转提示";
-    private String siteName = "我的博客";
-    private String whitelistDomains = "";
+    private Object pageTitle = "安全跳转提示";
+    private Object siteName = "我的博客";
+    private Object whitelistDomains = "";
     private Object enabled = "true";
+
+    public String getPageTitle() {
+        return pageTitle == null ? "安全跳转提示" : String.valueOf(pageTitle);
+    }
+
+    public String getSiteName() {
+        return siteName == null ? "我的博客" : String.valueOf(siteName);
+    }
+
+    public String getWhitelistDomains() {
+        return whitelistDomains == null ? "" : String.valueOf(whitelistDomains);
+    }
 
     public boolean isEnabled() {
         if (enabled instanceof Boolean) {

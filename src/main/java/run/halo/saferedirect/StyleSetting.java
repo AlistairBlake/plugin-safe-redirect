@@ -7,14 +7,34 @@ import lombok.Data;
  */
 @Data
 public class StyleSetting {
-    private String theme = "dream";
+    private Object theme = "dream";
     private Object countdown = "5";
     private Object showTargetUrl = "true";
     private Object showQrCode = "false";
-    private String iconUrl = "";
-    private String customHtml = "";
-    private String backgroundUrl = "";
-    private String backgroundColor = "";
+    private Object iconUrl = "";
+    private Object customHtml = "";
+    private Object backgroundUrl = "";
+    private Object backgroundColor = "";
+
+    public String getTheme() {
+        return theme == null ? "dream" : String.valueOf(theme);
+    }
+
+    public String getIconUrl() {
+        return iconUrl == null ? "" : String.valueOf(iconUrl);
+    }
+
+    public String getCustomHtml() {
+        return customHtml == null ? "" : String.valueOf(customHtml);
+    }
+
+    public String getBackgroundUrl() {
+        return backgroundUrl == null ? "" : String.valueOf(backgroundUrl);
+    }
+
+    public String getBackgroundColor() {
+        return backgroundColor == null ? "" : String.valueOf(backgroundColor);
+    }
 
     public int getCountdown() {
         if (countdown instanceof Number) {

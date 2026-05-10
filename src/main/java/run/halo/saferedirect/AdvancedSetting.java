@@ -7,9 +7,17 @@ import lombok.Data;
  */
 @Data
 public class AdvancedSetting {
-    private String customCss = "";
-    private String customTip = "";
+    private Object customCss = "";
+    private Object customTip = "";
     private Object trackOutbound = "false";
+
+    public String getCustomCss() {
+        return customCss == null ? "" : String.valueOf(customCss);
+    }
+
+    public String getCustomTip() {
+        return customTip == null ? "" : String.valueOf(customTip);
+    }
 
     public boolean isTrackOutbound() {
         if (trackOutbound instanceof Boolean) {
