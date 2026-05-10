@@ -62,7 +62,6 @@ public class SafeRedirectRouter {
         String targetUrl;
         try {
             targetUrl = URLDecoder.decode(rawUrl, StandardCharsets.UTF_8);
-            // 安全校验：只允许 http/https 协议，防止 javascript: 等注入
             if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
                 log.warn("Blocked non-http redirect attempt to: {}", targetUrl);
                 return ServerResponse.badRequest()
@@ -81,50 +80,94 @@ public class SafeRedirectRouter {
         return settingFetcher.fetch("basic", BasicSetting.class)
             .defaultIfEmpty(new BasicSetting())
             .flatMap(basicSetting -> {
-                // 检查插件是否启用
-                if (!basicSetting.isEnabled()) {
-                    // 插件禁用时直接302重定向
-                    return ServerResponse.temporaryRedirect(URI.create(finalUrl)).build();
+                try {
+                    return handleRedirectInternal(finalUrl, basicSetting);
+                } catch (Exception e) {
+                    log.error("Error processing redirect to: {}", finalUrl, e);
+                    return Mono.just(ServerResponse.internalServerError()
+                        .contentType(MediaType.TEXT_HTML)
+                        .bodyValue(buildErrorPage("服务器内部错误",
+                            "处理跳转请求时发生错误：" + escapeHtml(e.getMessage()) + "<br><br>" +
+                            "<a href=\"" + escapeHtml(finalUrl) + "\">点击此处直接访问目标网站</a>")));
                 }
+            })
+            .onErrorResume(e -> {
+                log.error("Unexpected error in redirect handler: {}", finalUrl, e);
+                return Mono.just(ServerResponse.internalServerError()
+                    .contentType(MediaType.TEXT_HTML)
+                    .bodyValue(buildErrorPage("服务器内部错误",
+                        "插件执行时发生意外错误：<br><code>" + 
+                        escapeHtml(e.getClass().getName() + ": " + e.getMessage()) +
+                        "</code><br><br>" +
+                        "<a href=\"" + escapeHtml(finalUrl) + "\">🔗 点击此处直接访问目标网站</a>")));
+            });
+    }
 
-                // 检查白名单
-                boolean whitelisted = isWhitelisted(finalUrl, basicSetting.getWhitelistDomains());
-                if (whitelisted) {
-                    log.debug("Whitelisted domain, direct redirect to: {}", finalUrl);
-                    try {
-                        return ServerResponse.temporaryRedirect(URI.create(finalUrl)).build();
-                    } catch (Exception e) {
-                        log.error("Failed to create redirect URI for whitelisted URL: {}", finalUrl, e);
-                        // 如果白名单跳转失败，继续显示中间页
-                    }
+    /**
+     * 内部跳转逻辑（可复用）
+     */
+    private Mono<ServerResponse> handleRedirectInternal(String finalUrl, BasicSetting basicSetting) {
+        if (!basicSetting.isEnabled()) {
+            try {
+                return Mono.just(ServerResponse.temporaryRedirect(URI.create(finalUrl)).block());
+            } catch (Exception e) {
+                log.error("Failed to create redirect URI: {}", finalUrl, e);
+                return buildErrorResponse(finalUrl, "重定向失败");
+            }
+        }
+
+        boolean whitelisted = isWhitelisted(finalUrl, basicSetting.getWhitelistDomains());
+        if (whitelisted) {
+            log.debug("Whitelisted domain, direct redirect to: {}", finalUrl);
+            try {
+                return Mono.just(ServerResponse.temporaryRedirect(URI.create(finalUrl)).block());
+            } catch (Exception e) {
+                log.error("Failed to create redirect URI for whitelisted URL: {}", finalUrl, e);
+                return buildErrorResponse(finalUrl, "白名单跳转失败");
+            }
+        }
+
+        return settingFetcher.fetch("advanced", AdvancedSetting.class)
+            .defaultIfEmpty(new AdvancedSetting())
+            .flatMap(advancedSetting -> {
+                if (advancedSetting.isTrackOutbound()) {
+                    log.info("Outbound link accessed: {}", finalUrl);
                 }
-
-                // 记录外链跳转（可选）
-                return settingFetcher.fetch("advanced", AdvancedSetting.class)
-                    .defaultIfEmpty(new AdvancedSetting())
-                    .flatMap(advancedSetting -> {
-                        if (advancedSetting.isTrackOutbound()) {
-                            log.info("Outbound link accessed: {}", finalUrl);
-                        }
-                        return settingFetcher.fetch("style", StyleSetting.class)
-                            .defaultIfEmpty(new StyleSetting())
-                            .flatMap(styleSetting -> {
-                                // 检查是否使用自定义 HTML
-                                String customHtml = styleSetting.getCustomHtml();
-                                if (customHtml != null && !customHtml.trim().isEmpty()) {
-                                    // 使用自定义 HTML（完全替换整个页面）
-                                    return ServerResponse.ok()
-                                        .contentType(MediaType.TEXT_HTML)
-                                        .bodyValue(buildCustomPage(finalUrl, basicSetting, customHtml.trim()));
-                                }
-                                // 使用默认模板
-                                return ServerResponse.ok()
+                return settingFetcher.fetch("style", StyleSetting.class)
+                    .defaultIfEmpty(new StyleSetting())
+                    .flatMap(styleSetting -> {
+                        try {
+                            String customHtml = styleSetting.getCustomHtml();
+                            if (customHtml != null && !customHtml.trim().isEmpty()) {
+                                return Mono.just(ServerResponse.ok()
                                     .contentType(MediaType.TEXT_HTML)
-                                    .bodyValue(buildRedirectPage(
-                                        finalUrl, basicSetting, styleSetting, advancedSetting));
-                            });
+                                    .bodyValue(buildCustomPage(finalUrl, basicSetting, customHtml.trim())));
+                            }
+                            return Mono.just(ServerResponse.ok()
+                                .contentType(MediaType.TEXT_HTML)
+                                .bodyValue(buildRedirectPage(
+                                    finalUrl, basicSetting, styleSetting, advancedSetting)));
+                        } catch (Exception e) {
+                            log.error("Error building redirect page for: {}", finalUrl, e);
+                            return buildErrorResponse(finalUrl, "页面构建失败: " + e.getMessage());
+                        }
                     });
             });
+    }
+
+    /**
+     * 构建统一的错误响应
+     */
+    private Mono<ServerResponse> buildErrorResponse(String targetUrl, String errorMessage) {
+        return Mono.just(ServerResponse.ok()
+            .contentType(MediaType.TEXT_HTML)
+            .bodyValue(buildErrorPage("跳转处理失败",
+                errorMessage + "<br><br>" +
+                "<div style=\"text-align:center; margin-top:20px;\">" +
+                "<a href=\"" + escapeHtml(targetUrl) + "\" " +
+                "style=\"display:inline-block;padding:12px 24px;background:#3B82F6;color:white;" +
+                "border-radius:8px;text-decoration:none;font-weight:bold;\">🔗 直接访问目标网站</a>" +
+                "</div>")));
     }
 
     /**
@@ -982,7 +1025,7 @@ public class SafeRedirectRouter {
         if (hasBgImage || hasBgColor) {
             css.append("    body {\n");
 
-            if (hasBgImage) {
+            if (hasBgImage && backgroundUrl != null) {
                 String safeUrl = escapeHtml(backgroundUrl.trim());
                 css.append("      background-image: url('").append(safeUrl).append("') !important;\n");
                 css.append("      background-size: cover !important;\n");
@@ -991,7 +1034,7 @@ public class SafeRedirectRouter {
                 css.append("      background-attachment: fixed !important;\n");
             }
 
-            if (hasBgColor) {
+            if (hasBgColor && backgroundColor != null) {
                 String safeColor = backgroundColor.trim();
                 // 检测是否是渐变（包含 gradient 关键字）
                 if (safeColor.toLowerCase().contains("gradient")) {
