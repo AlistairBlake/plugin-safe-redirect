@@ -48,7 +48,7 @@ spec:
           value: "dream"
           options:
             - value: "dream"
-              label: "� 默认 - Dream 毛玻璃中转页"
+              label: "默认 - Dream 毛玻璃中转页"
             - value: "minimal"
               label: "⬜ 极简 - 纯净白色风格"
             - value: "tech"
