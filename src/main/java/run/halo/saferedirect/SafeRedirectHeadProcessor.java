@@ -38,7 +38,7 @@ public class SafeRedirectHeadProcessor implements TemplateHeadProcessor {
                               IElementModelStructureHandler handler) {
         return settingFetcher.fetch("basic", BasicSetting.class)
             .defaultIfEmpty(new BasicSetting())
-            .flatMap(basic -> {
+            .<Void>flatMap(basic -> {
                 try {
                     if (!basic.isEnabled()) {
                         log.debug("SafeRedirect plugin is disabled, skipping head injection.");
