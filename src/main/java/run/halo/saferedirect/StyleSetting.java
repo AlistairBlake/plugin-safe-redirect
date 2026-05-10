@@ -7,7 +7,7 @@ import lombok.Data;
  */
 @Data
 public class StyleSetting {
-    private Object theme = "dream";
+    private Object theme = "minimal";
     private Object countdown = "5";
     private Object showTargetUrl = "true";
     private Object showQrCode = "false";
@@ -17,7 +17,7 @@ public class StyleSetting {
     private Object backgroundColor = "";
 
     public String getTheme() {
-        return theme == null ? "dream" : String.valueOf(theme);
+        return theme == null ? "minimal" : String.valueOf(theme);
     }
 
     public String getIconUrl() {
@@ -51,13 +51,25 @@ public class StyleSetting {
         if (showTargetUrl instanceof Boolean) {
             return (Boolean) showTargetUrl;
         }
-        return "true".equalsIgnoreCase(String.valueOf(showTargetUrl));
+        if (showTargetUrl instanceof Number) {
+            return ((Number) showTargetUrl).intValue() != 0;
+        }
+        String strVal = String.valueOf(showTargetUrl);
+        return "true".equalsIgnoreCase(strVal)
+            || "yes".equalsIgnoreCase(strVal)
+            || "1".equals(strVal);
     }
 
     public boolean isShowQrCode() {
         if (showQrCode instanceof Boolean) {
             return (Boolean) showQrCode;
         }
-        return "true".equalsIgnoreCase(String.valueOf(showQrCode));
+        if (showQrCode instanceof Number) {
+            return ((Number) showQrCode).intValue() != 0;
+        }
+        String strVal = String.valueOf(showQrCode);
+        return "true".equalsIgnoreCase(strVal)
+            || "yes".equalsIgnoreCase(strVal)
+            || "1".equals(strVal);
     }
 }

@@ -28,6 +28,12 @@ public class BasicSetting {
         if (enabled instanceof Boolean) {
             return (Boolean) enabled;
         }
-        return "true".equalsIgnoreCase(String.valueOf(enabled));
+        if (enabled instanceof Number) {
+            return ((Number) enabled).intValue() != 0;
+        }
+        String strVal = String.valueOf(enabled);
+        return "true".equalsIgnoreCase(strVal)
+            || "yes".equalsIgnoreCase(strVal)
+            || "1".equals(strVal);
     }
 }

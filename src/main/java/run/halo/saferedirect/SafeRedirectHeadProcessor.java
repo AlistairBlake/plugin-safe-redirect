@@ -110,7 +110,6 @@ public class SafeRedirectHeadProcessor implements TemplateHeadProcessor {
             <script data-plugin="safe-redirect">
             (function() {
               'use strict';
-              // 安全链接跳转插件 - 链接拦截脚本
               var REDIRECT_BASE = '/plugins/plugin-safe-redirect/go';
               var WHITELIST = %s;
               var currentHost = window.location.hostname;
@@ -134,6 +133,7 @@ public class SafeRedirectHeadProcessor implements TemplateHeadProcessor {
               }
 
               function rewriteLink(anchor) {
+                if (!anchor || anchor.nodeType !== 1) return;
                 if (anchor.hasAttribute('data-no-redirect')) return;
                 if (anchor.hasAttribute('data-sr-processed')) return;
                 var href = anchor.getAttribute('href');
@@ -146,6 +146,22 @@ public class SafeRedirectHeadProcessor implements TemplateHeadProcessor {
               function processAllLinks() {
                 document.querySelectorAll('a[href]').forEach(rewriteLink);
               }
+
+              // 点击事件兜底：捕获阶段拦截未处理的链接
+              document.addEventListener('click', function(e) {
+                var target = e.target;
+                while (target && target.tagName !== 'A') {
+                  target = target.parentElement;
+                }
+                if (!target || target.tagName !== 'A') return;
+                if (target.hasAttribute('data-no-redirect')) return;
+                var href = target.getAttribute('href');
+                if (!href || !isExternalLink(href)) return;
+                e.preventDefault();
+                e.stopPropagation();
+                target.href = REDIRECT_BASE + '?url=' + encodeURIComponent(href);
+                target.click();
+              }, true);
 
               if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', processAllLinks);
@@ -166,9 +182,17 @@ public class SafeRedirectHeadProcessor implements TemplateHeadProcessor {
                   });
                 });
               });
-              observer.observe(document.body || document.documentElement, {
-                childList: true, subtree: true
-              });
+
+              function startObserver() {
+                var target = document.body || document.documentElement;
+                observer.observe(target, { childList: true, subtree: true });
+              }
+
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', startObserver);
+              } else {
+                startObserver();
+              }
             })();
             </script>
             """.formatted(whitelistJs);

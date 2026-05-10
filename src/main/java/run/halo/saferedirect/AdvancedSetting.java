@@ -23,6 +23,12 @@ public class AdvancedSetting {
         if (trackOutbound instanceof Boolean) {
             return (Boolean) trackOutbound;
         }
-        return "true".equalsIgnoreCase(String.valueOf(trackOutbound));
+        if (trackOutbound instanceof Number) {
+            return ((Number) trackOutbound).intValue() != 0;
+        }
+        String strVal = String.valueOf(trackOutbound);
+        return "true".equalsIgnoreCase(strVal)
+            || "yes".equalsIgnoreCase(strVal)
+            || "1".equals(strVal);
     }
 }
